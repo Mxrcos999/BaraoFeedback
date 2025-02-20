@@ -1,0 +1,6 @@
+@BaraoFeedback.Api_HostAddress = http://localhost:5137
+
+GET {{BaraoFeedback.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
