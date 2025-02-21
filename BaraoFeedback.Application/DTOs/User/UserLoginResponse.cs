@@ -9,6 +9,7 @@ public class UserLoginResponse
     public bool Success => Errors.Message.Count == 0 ? true : false;
 
     public string Email { get; private set; }
+    public string Type { get; private set; } 
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string AccessToken { get; private set; }
@@ -25,10 +26,11 @@ public class UserLoginResponse
     public UserLoginResponse(bool success)
     { }
 
-    public UserLoginResponse(bool success, string accessToken, string refreshToken, string expirationTimeRefreshtoken, string expirationTimeAccessToken)
+    public UserLoginResponse(bool success, string type, string accessToken, string refreshToken, string expirationTimeRefreshtoken, string expirationTimeAccessToken)
     {
         AccessToken = accessToken;
         RefreshToken = refreshToken;
+        Type = type;
         ExpirationTimeAccessToken = expirationTimeAccessToken;
         ExpirationTimeRefreshtoken = expirationTimeRefreshtoken;
         ExpirationDateTimeAccessToken = DateTime.Now.AddSeconds(3000);

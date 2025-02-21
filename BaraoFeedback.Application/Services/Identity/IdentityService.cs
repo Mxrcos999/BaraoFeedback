@@ -9,7 +9,7 @@ using System.Security.Claims;
 public interface IIdentityService
 {
     Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin);
-    Task<UserRegisterResponse> RegisterUser(UserRegisterRequest userRegister);
+    Task<UserRegisterResponse> RegisterStudent(string type, UserRegisterRequest userRegister);
 }
 public class IdentityService : IIdentityService
 {
@@ -57,12 +57,12 @@ public class IdentityService : IIdentityService
 
         return userLoginResponse;
     }
-    public async Task<UserRegisterResponse> RegisterUser(UserRegisterRequest userRegister)
+    public async Task<UserRegisterResponse> RegisterStudent(string type, UserRegisterRequest userRegister)
     {
         var user = new ApplicationUser()
         {
             Email = userRegister.Email,
-            Type = userRegister.Type,
+            Type = type,
             UserName = userRegister.Name,
         };
         var users = _userManager.Users.AsEnumerable();
@@ -139,6 +139,7 @@ public class IdentityService : IIdentityService
         return new UserLoginResponse
         (
             true,
+            user.Type,
             accessToken,
             refreshToken,
             expirationTimeRefreshToken,

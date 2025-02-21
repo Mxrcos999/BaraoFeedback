@@ -15,5 +15,4 @@ public class UserRegisterRequest
     public string Password { get; set; }
     [Compare(nameof(Password), ErrorMessage = "As senhas devem ser iguais.")]
     public string ConfirmEmail { get; set; }
-    public string Type { get; set; }
 }

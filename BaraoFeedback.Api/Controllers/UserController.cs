@@ -14,10 +14,19 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Route("user/post-user")]
-    public async Task<IActionResult> RegisterUserAsync(UserRegisterRequest request)
+    [Route("user/post-student-user")]
+    public async Task<IActionResult> RegisterStudentAsync(UserRegisterRequest request)
     {
-        var response = await _userService.RegisterUser(request);
+        var response = await _userService.RegisterStudent("student", request);
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [Route("user/post-admin-user")]
+    public async Task<IActionResult> RegisterAdminAsync(UserRegisterRequest request)
+    {
+        var response = await _userService.RegisterStudent("admin", request);
 
         return Ok(response);
     }
