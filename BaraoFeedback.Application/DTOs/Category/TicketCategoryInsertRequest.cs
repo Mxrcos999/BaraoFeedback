@@ -1,6 +1,6 @@
 ﻿namespace BaraoFeedback.Application.DTOs.Category;
 
-public class CategoryInsertRequest
+public class TicketCategoryInsertRequest
 {
     public string Description { get; set; }
 }

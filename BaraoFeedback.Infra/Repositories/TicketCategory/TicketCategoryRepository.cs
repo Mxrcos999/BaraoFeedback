@@ -15,16 +15,28 @@ public class TicketCategoryRepository : ITicketCategoryRepository
         _context = context;
     }
 
-    public async Task<List<CategoryResponse>> GetTicketAsync(TicketCategoryQuery query)
+    public async Task<List<TicketCategoryResponse>> GetTicketCategoryAsync(TicketCategoryQuery query)
     {
         var categoriesTickets = (from data in _context.TicketCategory
                       .AsNoTracking()
                       .Where(query.CreateFilterExpression())
-                                 select new CategoryResponse()
+                                 select new TicketCategoryResponse()
                                  {
                                      Description = data.Description,
                                      DescriptionId = data.Id,
                                      TicketQuantity = data.Tickets.Count()
+                                 }).ToList();
+
+        return categoriesTickets;
+    }
+    public async Task<List<CategoryResponse>> GetCategoryAsync()
+    {
+        var categoriesTickets = (from data in _context.TicketCategory
+                      .AsNoTracking()
+                                 select new CategoryResponse()
+                                 {
+                                     Description = data.Description,
+                                     DescriptionId = data.Id,
                                  }).ToList();
 
         return categoriesTickets;

@@ -1,8 +1,13 @@
 
 using BaraoFeedback.Api.Extensions;
+using BaraoFeedback.Application.Interfaces;
+using BaraoFeedback.Application.Services.Ticket;
+using BaraoFeedback.Application.Services.TicketCategory;
 using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Infra.Context;
+using BaraoFeedback.Infra.Repositories.Ticket;
+using BaraoFeedback.Infra.Repositories.TicketCategory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +36,10 @@ namespace BaraoFeedback.Api
                 });
             });
             builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddScoped<ITicketCategoryService, TicketCategoryService>();
+            builder.Services.AddScoped<ITicketService, TicketService>();
+            builder.Services.AddScoped<ITicketCategoryRepository, TicketCategoryRepository>();
+            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
             builder.Services.AddDbContext<BaraoFeedbackContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
 
