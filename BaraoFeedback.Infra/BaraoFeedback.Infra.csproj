@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaraoFeedback.Application\BaraoFeedback.Application.csproj" />
     <ProjectReference Include="..\BaraoFeedback.Domain\BaraoFeedback.Domain.csproj" />
   </ItemGroup>
 

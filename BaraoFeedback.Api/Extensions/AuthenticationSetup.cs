@@ -11,43 +11,46 @@ public static class AuthenticationSetup
 {
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtAppSettingOptions = configuration.GetSection(nameof(JwtOptions));
-        var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetSection("JwtOptions:SecurityKey").Value));
+        var JwtAppSettings = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
 
-        services.Configure<JwtOptions>(options =>
-        {
-            options.Issuer = jwtAppSettingOptions[nameof(JwtOptions.Issuer)];
-            options.Audience = jwtAppSettingOptions[nameof(JwtOptions.Audience)];
-            options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
-            options.AccessTokenExpiration = int.Parse(jwtAppSettingOptions[nameof(JwtOptions.AccessTokenExpiration)] ?? "0");
-            options.RefreshTokenExpiration = int.Parse(jwtAppSettingOptions[nameof(JwtOptions.RefreshTokenExpiration)] ?? "0");
-        });
-
-        services.Configure<IdentityOptions>(options =>
-        {
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = 6;
-        });
+        var securityKey = new SymmetricSecurityKey(
+            Encoding.ASCII.GetBytes(
+                configuration.GetSection("JwtOptions:SecurityKey").Value
+            )
+        );
 
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = configuration.GetSection("JwtOptions:Issuer").Value,
-
+            ValidIssuer = JwtAppSettings.Issuer,
             ValidateAudience = true,
-            ValidAudience = configuration.GetSection("JwtOptions:Audience").Value,
-
+            ValidAudience = JwtAppSettings.Audience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = securityKey,
-
             RequireExpirationTime = true,
-            ValidateLifetime = true,
-
-
+            ValidateLifetime = true
         };
+
+        //Configuração de geração de Token
+        services.Configure<JwtOptions>(options => {
+            options.Issuer = JwtAppSettings.Issuer;
+            options.Audience = JwtAppSettings.Audience;
+            options.SigningCredentials = new SigningCredentials(
+                securityKey,
+                SecurityAlgorithms.HmacSha256
+            ); ;
+            options.AccessTokenExpiration = JwtAppSettings.AccessTokenExpiration;
+        });
+
+        //Requisitos de geração de senha senha
+        services.Configure<IdentityOptions>(options => {
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 4;
+            options.Password.RequiredUniqueChars = 0;
+        });
 
         services.AddAuthentication(options =>
         {
@@ -55,20 +58,9 @@ public static class AuthenticationSetup
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-
             options.TokenValidationParameters = tokenValidationParameters;
         });
-    }
 
-    public static void AddAuthorizationPolicies(this IServiceCollection services)
-    {
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("LoggedInPolicy", policy =>
-            {
-                policy.RequireAuthenticatedUser();
-            });
-        });
+        services.AddAuthorization();
     }
 }
-

@@ -1,5 +1,6 @@
 
 using BaraoFeedback.Api.Extensions;
+using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Infra.Context;
 using Microsoft.AspNetCore.Identity;
@@ -31,7 +32,7 @@ namespace BaraoFeedback.Api
             });
             builder.Services.AddScoped<IIdentityService, IdentityService>();
             builder.Services.AddDbContext<BaraoFeedbackContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                .AddRoles<IdentityRole>()
@@ -42,8 +43,6 @@ namespace BaraoFeedback.Api
                .AddDefaultTokenProviders();
 
             builder.Services.AddAuthentication(builder.Configuration);
-            builder.Services.AddAuthorizationPolicies();
-
 
             var app = builder.Build();
 
@@ -57,6 +56,7 @@ namespace BaraoFeedback.Api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseAuthentication();
             app.UseCors("AllowAll");
 
             app.MapControllers();

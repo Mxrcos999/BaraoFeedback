@@ -1,16 +1,12 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.DTOs.User;
+using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options; 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-public interface IIdentityService
-{
-    Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin);
-    Task<UserRegisterResponse> RegisterStudent(string type, UserRegisterRequest userRegister);
-}
 public class IdentityService : IIdentityService
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -28,9 +24,10 @@ public class IdentityService : IIdentityService
     public async Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(userLogin.UserName, userLogin.Password, isPersistent: false, lockoutOnFailure: true);
+  
         if (signInResult.Succeeded)
         {
-            var credenciais = await GerarCredenciais(userLogin.UserName);
+            var credenciais = await GenerateCredentials(userLogin.UserName);
             return credenciais;
         }
 
@@ -57,18 +54,38 @@ public class IdentityService : IIdentityService
 
         return userLoginResponse;
     }
-    public async Task<UserRegisterResponse> RegisterStudent(string type, UserRegisterRequest userRegister)
+    public async Task<UserRegisterResponse> RegisterAdminAsync(string type, AdminRegisterRequest request)
+    {
+        var user = new ApplicationUser()
+        {
+            Email = request.Email,
+            Type = type,
+            Name = request.Name,
+            UserName = request.Email,
+        };
+
+        IdentityResult result = await _userManager.CreateAsync(user, request.Password);
+
+        return await ValidateRegisterAsync(result);
+
+    }
+
+    public async Task<UserRegisterResponse> RegisterStudentAsync(string type, StudentRegisterRequest userRegister)
     {
         var user = new ApplicationUser()
         {
             Email = userRegister.Email,
             Type = type,
-            UserName = userRegister.Name,
-        };
-        var users = _userManager.Users.AsEnumerable();
-         
+            Name = userRegister.Name,
+            UserName = userRegister.StudentCode,
+        };         
 
         IdentityResult result = await _userManager.CreateAsync(user, userRegister.Password);
+
+        return await ValidateRegisterAsync(result);
+    }
+    private async Task<UserRegisterResponse> ValidateRegisterAsync(IdentityResult result)
+    {
 
         UserRegisterResponse userRegisterResponse = new UserRegisterResponse(result.Succeeded);
 
@@ -122,17 +139,18 @@ public class IdentityService : IIdentityService
 
         return response;
     }
-    private async Task<UserLoginResponse> GerarCredenciais(string email)
+
+    protected async Task<UserLoginResponse> GenerateCredentials(string username)
     {
-        var user = await _userManager.FindByNameAsync(email);
-        var accessTokenClaims = await ObterClaims(user, adicionarClaimsUsuario: true);
-        var refreshTokenClaims = await ObterClaims(user, adicionarClaimsUsuario: false);
+        var user = await _userManager.FindByNameAsync(username);
+        var accessTokenClaims = await GetClaims(user, adicionarClaimsUsuario: true);
+        var refreshTokenClaims = await GetClaims(user, adicionarClaimsUsuario: false);
 
         var dataExpiracaoAccessToken = DateTime.Now.AddSeconds(_jwtOptions.AccessTokenExpiration);
-        var dataExpiracaoRefreshToken = DateTime.Now.AddSeconds(_jwtOptions.RefreshTokenExpiration);
+        var dataExpiracaoRefreshToken = DateTime.Now.AddSeconds(10800);
 
-        var accessToken = GerarToken(accessTokenClaims, dataExpiracaoAccessToken);
-        var refreshToken = GerarToken(refreshTokenClaims, dataExpiracaoRefreshToken);
+        var accessToken = GenerateToken(accessTokenClaims, dataExpiracaoAccessToken);
+        var refreshToken = GenerateToken(refreshTokenClaims, dataExpiracaoRefreshToken);
         var expirationAcessToken = _jwtOptions.AccessTokenExpiration.ToString();
         var expirationTimeRefreshToken = _jwtOptions.RefreshTokenExpiration.ToString();
 
@@ -140,39 +158,43 @@ public class IdentityService : IIdentityService
         (
             true,
             user.Type,
-            accessToken,
+            accessToken, 
             refreshToken,
             expirationTimeRefreshToken,
-            expirationAcessToken
+            expirationAcessToken,
+            user.Name,
+            user.Id,
+            user.Email
         );
     }
-    private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
+
+    protected string GenerateToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {
-        JwtSecurityToken token = new JwtSecurityToken(_jwtOptions.Issuer, _jwtOptions.Audience, claims, DateTime.Now, dataExpiracao, _jwtOptions.SigningCredentials);
+        JwtSecurityToken token = new JwtSecurityToken(_jwtOptions.Issuer, _jwtOptions.Audience, claims, DateTime.Now, expires: dataExpiracao, signingCredentials: _jwtOptions.SigningCredentials);
+
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    private async Task<IList<Claim>> ObterClaims(ApplicationUser user, bool adicionarClaimsUsuario)
+    private async Task<IList<Claim>> GetClaims(ApplicationUser user, bool adicionarClaimsUsuario)
     {
-        var claims = new List<Claim>();
+        var claims = await _userManager.GetClaimsAsync(user);
+
+        var roles = await _userManager.GetRolesAsync(user);
 
         claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
         claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()));
-        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()));
 
-        if (adicionarClaimsUsuario)
+        var now = DateTimeOffset.UtcNow;
+        claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, now.ToUnixTimeSeconds().ToString()));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+
+        foreach (var role in roles)
         {
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            claims.AddRange(userClaims);
-
-            foreach (var role in roles)
-                claims.Add(new Claim("role", role));
+            claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
         return claims;
     }
+
 
 }

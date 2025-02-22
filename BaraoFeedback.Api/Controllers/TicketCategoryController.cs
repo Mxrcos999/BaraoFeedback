@@ -1,18 +1,16 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
 using BaraoFeedback.Application.DTOs.Shared;
-using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Infra.Querys;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
-[Route("Category")]
 public class TicketCategoryController : ControllerBase
 {
     public TicketCategoryController()
     {
-        
+
     }
 
     [HttpGet]
