@@ -56,12 +56,14 @@ public class IdentityService : IIdentityService
     }
     public async Task<UserRegisterResponse> RegisterAdminAsync(string type, AdminRegisterRequest request)
     {
+        string email = request.Username + "@baraodemaua.br";
+
         var user = new ApplicationUser()
         {
-            Email = request.Email,
+            Email = email,
             Type = type,
             Name = request.Name,
-            UserName = request.Email,
+            UserName = request.Username,
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, request.Password);
@@ -72,9 +74,10 @@ public class IdentityService : IIdentityService
 
     public async Task<UserRegisterResponse> RegisterStudentAsync(string type, StudentRegisterRequest userRegister)
     {
+        string email = userRegister.StudentCode + "@baraodemaua.edu.br";
         var user = new ApplicationUser()
         {
-            Email = userRegister.Email,
+            Email = email,
             Type = type,
             Name = userRegister.Name,
             UserName = userRegister.StudentCode,
