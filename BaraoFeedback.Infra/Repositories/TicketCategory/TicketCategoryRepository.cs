@@ -2,15 +2,16 @@
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Infra.Context;
 using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Infra.Repositories.Shared;
 using System.Data.Entity;
 
 namespace BaraoFeedback.Infra.Repositories.TicketCategory;
 
-public class TicketCategoryRepository : ITicketCategoryRepository
+public class TicketCategoryRepository : GenericRepository<Domain.Entities.TicketCategory>, ITicketCategoryRepository
 {
     private readonly BaraoFeedbackContext _context;
 
-    public TicketCategoryRepository(BaraoFeedbackContext context)
+    public TicketCategoryRepository(BaraoFeedbackContext context) : base(context)
     {
         _context = context;
     }

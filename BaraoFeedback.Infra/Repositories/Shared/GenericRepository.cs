@@ -21,6 +21,11 @@ public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> w
         _entity = _context.Set<TEntity>();
 
     }
+
+    public string GetUserId()
+    {
+        return _currentUserId;
+    }
     public async Task<int> GetTotalPages(Expression<Func<TEntity, bool>>? filterExpression = null, double? quantityItems = null)
     {
         return (int)Math.Ceiling(_entity.Where(filterExpression != null ? filterExpression : x => true).Count() / (double)quantityItems);

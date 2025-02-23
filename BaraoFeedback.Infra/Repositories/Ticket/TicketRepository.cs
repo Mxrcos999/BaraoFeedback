@@ -39,6 +39,26 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
         return tickets;
     } 
 
+    public async Task<TicketResponse> GetTicketByIdAsync(long entityId)
+    {
+        var ticket = (from data in _context.Ticket
+                      .AsNoTracking()
+                      .Where(x => x.Id == entityId)
+                       select new TicketResponse()
+                       {
+                           CategoryName = data.TicketCategory.Description,
+                           Description = data.Description,
+                           CreatedAt = data.CreatedAt.ToString("dd/MM/yyyy"),
+                           InstitutionName = data.Institution.Name,
+                           Title = data.Title,
+                           StudentCode = data.ApplicationUser.UserName,
+                           StudentName = data.ApplicationUser.Name,
+                           TicketId = data.Id,
+                       }).FirstOrDefault();
+
+        return ticket;
+    } 
+
     public async Task<bool> PostTicketAsync(Domain.Entities.Ticket entity)
     {
         await _context.Ticket.AddAsync(entity);

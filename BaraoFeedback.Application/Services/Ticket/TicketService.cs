@@ -25,15 +25,38 @@ public class TicketService : ITicketService
         response.Sucess = true;
         return response;
     }
+    public async Task<DefaultResponse> GetTicketByIdAsync(long id)
+    {
+        var response = new DefaultResponse();
+
+        response.Data = await _ticketRepository.GetTicketByIdAsync(id);
+
+        response.Sucess = true;
+        return response;
+    }
     public async Task<DefaultResponse> PostTicketAsync(TicketInsertRequest request)
     {
         var response = new DefaultResponse();
         var entity = new Domain.Entities.Ticket()
         {
+            ApplicationUserId = _ticketRepository.GetUserId(),
+            Description = request.Description,
+            InstitutionId = request.InstitutionId,
+            TicketCategoryId = request.CategoryId,
+            Title = request.Title, 
         };
         response.Data = await _ticketRepository.PostTicketAsync(entity);
 
         response.Sucess = true;
+
+        return response;
+    }
+
+    public async Task<DefaultResponse> DeleteAsync(long entityId)
+    {
+        var response = new DefaultResponse();
+        var entity = await _ticketRepository.GetByIdAsync(entityId);
+        response.Data = await _ticketRepository.DeleteAsync(entity, default);
 
         return response;
     }

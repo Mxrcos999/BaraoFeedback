@@ -15,6 +15,21 @@ public class TicketQuery
     {
         var predicate = PredicateBuilder.True<Ticket>();
 
+        if(InstitutionId is not null && InstitutionId > 0)
+            predicate = predicate.And(x => x.InstitutionId == InstitutionId);
+        
+        if(CategoryId is not null && CategoryId > 0)
+            predicate = predicate.And(x => x.TicketCategoryId == CategoryId);
+        
+        if(!string.IsNullOrEmpty(StudentCode))
+            predicate = predicate.And(x => x.ApplicationUser.Type == "student" && x.ApplicationUser.UserName == StudentCode);
+
+        if (InitialDate is not null)
+            predicate = predicate.And(x => x.CreatedAt >= InitialDate); 
+
+        if (EndDate is not null)
+            predicate = predicate.And(x => x.CreatedAt <= EndDate);
+
         return predicate;
     }
 }

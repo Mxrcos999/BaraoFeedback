@@ -5,6 +5,7 @@ namespace BaraoFeedback.Application.Interfaces;
 
 public interface IGenericRepository<TEntity> where TEntity : class
 {
+    string GetUserId();
     Task<IEnumerable<object>> GetAsync(Expression<Func<TEntity, bool>>? filterExpression = null);
     Task<TEntity> GetByIdAsync(long id);
     Task<bool> PostAsync(TEntity entity, CancellationToken ct);

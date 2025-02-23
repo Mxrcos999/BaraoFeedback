@@ -57,4 +57,13 @@ public class TicketCategoryService : ITicketCategoryService
          response.Data = await _ticketCategoryRepository.GetCategoryAsync();
         return response;
     }
+
+    public async Task<DefaultResponse> DeleteAsync(long entityId)
+    {
+        var response = new DefaultResponse();
+        var entity = await _ticketCategoryRepository.GetByIdAsync(entityId);
+        response.Data = await _ticketCategoryRepository.DeleteAsync(entity, default);
+
+        return response;
+    }
 }

@@ -7,5 +7,6 @@ namespace BaraoFeedback.Application.Interfaces;
 public interface ITicketRepository : IGenericRepository<Ticket>
 {
     Task<bool> PostTicketAsync(Domain.Entities.Ticket entity);
+    Task<TicketResponse> GetTicketByIdAsync(long entityId);
     Task<List<TicketResponse>> GetTicketAsync(TicketQuery query);
 }
