@@ -37,7 +37,7 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
                                  select new CategoryResponse()
                                  {
                                      Description = data.Description,
-                                     DescriptionId = data.Id,
+                                     CategoryId = data.Id,
                                  }).ToList();
 
         return categoriesTickets;

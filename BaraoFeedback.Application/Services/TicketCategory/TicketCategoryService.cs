@@ -43,7 +43,7 @@ public class TicketCategoryService : ITicketCategoryService
 
             if (!query.IsDescending.Value)
             {
-                data.Sort();
+                data.Sort((a, b) => a.TicketQuantity.CompareTo(b.TicketQuantity));
                 response.Data = data;
             }
         }
