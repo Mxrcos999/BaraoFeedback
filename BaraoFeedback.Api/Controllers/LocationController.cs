@@ -1,10 +1,12 @@
 ﻿using BaraoFeedback.Application.DTOs.Location;
 using BaraoFeedback.Application.Services.Location;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("location/")]
 public class LocationController : ControllerBase
 {
