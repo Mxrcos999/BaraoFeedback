@@ -22,7 +22,6 @@ public class TicketService : ITicketService
 
         response.Data = await _ticketRepository.GetTicketAsync(query);
 
-        response.Sucess = true;
         return response;
     }
     public async Task<DefaultResponse> GetTicketByIdAsync(long id)
@@ -31,7 +30,6 @@ public class TicketService : ITicketService
 
         response.Data = await _ticketRepository.GetTicketByIdAsync(id);
 
-        response.Sucess = true;
         return response;
     }
     public async Task<DefaultResponse> PostTicketAsync(TicketInsertRequest request)
@@ -46,8 +44,6 @@ public class TicketService : ITicketService
             Title = request.Title, 
         };
         response.Data = await _ticketRepository.PostTicketAsync(entity);
-
-        response.Sucess = true;
 
         return response;
     }

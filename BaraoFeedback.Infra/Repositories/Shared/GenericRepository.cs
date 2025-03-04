@@ -31,13 +31,13 @@ public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> w
         return (int)Math.Ceiling(_entity.Where(filterExpression != null ? filterExpression : x => true).Count() / (double)quantityItems);
     }
 
-    public virtual async Task<IEnumerable<object>> GetAsync(Expression<Func<TEntity, bool>>? filterExpression = null)
+    public virtual async Task<IQueryable<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filterExpression = null)
     {
         var dbSet = TrackingItem(false);
         if (filterExpression is null)
-            return dbSet.AsEnumerable();
+            return dbSet.AsNoTracking();
 
-        return dbSet.Where(filterExpression).AsEnumerable();
+        return dbSet.AsNoTracking().Where(filterExpression);
     }
 
     public virtual async Task<TEntity> GetByIdAsync(long id)

@@ -3,7 +3,7 @@
 
 public sealed class DefaultResponse
 {
-    public bool Sucess { get; set; }
+    public bool Sucess => Errors.Message.Count == 0;
     public object Data { get; set; }
     public Errors Errors { get; set; } = new Errors();
 

@@ -136,9 +136,7 @@ public class IdentityService : IIdentityService
         var response = new DefaultResponse();
         var user = await _userManager.FindByEmailAsync(email);
          
-
-        var result = await _userManager.DeleteAsync(user);
-        response.Sucess = result.Succeeded;
+        await _userManager.DeleteAsync(user);
 
         return response;
     }

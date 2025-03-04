@@ -34,7 +34,8 @@ public class BaraoFeedbackContext : IdentityDbContext<ApplicationUser>
 
         //builder.ApplyConfiguration(new ApplicationUserMap()); 
     }
-    public DbSet<TicketCategory> TicketCategory { get; set; } 
+    public DbSet<Location> Location { get; set; }
+    public DbSet<TicketCategory> TicketCategory { get; set; }
     public DbSet<Ticket> Ticket { get; set; } 
     public DbSet<Institution> Institution { get; set; } 
 }
