@@ -1,19 +1,19 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Interfaces;
-using BaraoFeedback.Infra.Querys;
-using BaraoFeedback.Domain.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
+using BaraoFeedback.Application.Services.Email;
+using BaraoFeedback.Infra.Querys; 
 namespace BaraoFeedback.Application.Services.Ticket;
 
 public class TicketService : ITicketService
 {
     private readonly ITicketRepository _ticketRepository;
+    private readonly IEmailService _emailService;
 
-    public TicketService(ITicketRepository ticketRepository)
+    public TicketService(ITicketRepository ticketRepository, IEmailService emailService)
     {
         _ticketRepository = ticketRepository;
+        _emailService = emailService;
     }
 
     public async Task<DefaultResponse> GetTicketAsync(TicketQuery query)
@@ -45,6 +45,8 @@ public class TicketService : ITicketService
             Title = request.Title, 
         };
         response.Data = await _ticketRepository.PostTicketAsync(entity);
+
+   //     _emailService.SendEmail("Marcos", "marcosfelipehd4@gmail.com");
 
         return response;
     }

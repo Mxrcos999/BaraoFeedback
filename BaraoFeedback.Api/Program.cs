@@ -1,6 +1,7 @@
 
 using BaraoFeedback.Api.Extensions;
 using BaraoFeedback.Application.Interfaces;
+using BaraoFeedback.Application.Services.Email;
 using BaraoFeedback.Application.Services.Institution;
 using BaraoFeedback.Application.Services.Location;
 using BaraoFeedback.Application.Services.Ticket;
@@ -39,15 +40,18 @@ namespace BaraoFeedback.Api
                         .AllowAnyHeader();
                 });
             });
+
             builder.Services.AddScoped<IIdentityService, IdentityService>();
             builder.Services.AddScoped<ITicketCategoryService, TicketCategoryService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<IInstitutionService, InstitutionService>();
             builder.Services.AddScoped<ILocationService, LocationService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ITicketCategoryRepository, TicketCategoryRepository>();
             builder.Services.AddScoped<ITicketRepository, TicketRepository>();
             builder.Services.AddScoped<IInstitutionRepository, InstitutionRepository>();
             builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+
             builder.Services.AddDbContext<BaraoFeedbackContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
 
@@ -63,7 +67,6 @@ namespace BaraoFeedback.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
