@@ -41,6 +41,7 @@ public class TicketService : ITicketService
             Description = request.Description,
             InstitutionId = request.InstitutionId,
             TicketCategoryId = request.CategoryId,
+            LocationId = request.LocationId,
             Title = request.Title, 
         };
         response.Data = await _ticketRepository.PostTicketAsync(entity);

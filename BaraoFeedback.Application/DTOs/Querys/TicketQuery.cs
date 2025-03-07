@@ -7,6 +7,7 @@ namespace BaraoFeedback.Infra.Querys;
 public class TicketQuery
 {
     public long? InstitutionId { get; set; }
+    public long? LocationId { get; set; }
     public long? CategoryId { get; set; }
     public string? StudentCode { get; set; }
     public DateTime? InitialDate { get; set; }
@@ -17,6 +18,9 @@ public class TicketQuery
 
         if(InstitutionId is not null && InstitutionId > 0)
             predicate = predicate.And(x => x.InstitutionId == InstitutionId);
+
+        if(LocationId is not null && LocationId > 0)
+            predicate = predicate.And(x => x.LocationId == LocationId);
         
         if(CategoryId is not null && CategoryId > 0)
             predicate = predicate.And(x => x.TicketCategoryId == CategoryId);

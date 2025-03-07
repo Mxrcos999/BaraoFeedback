@@ -8,6 +8,7 @@ public class TicketResponse
     public string StudentCode { get; set; }
     public string StudentName { get; set; }
     public string InstitutionName { get; set; }
+    public string LocationName { get; set; }
     public string CategoryName { get; set; }
     public string CreatedAt { get; set; }
 }

@@ -1,8 +1,5 @@
-﻿using BaraoFeedback.Application.DTOs.Shared;
-using BaraoFeedback.Application.DTOs.Ticket;
+﻿using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Services.Ticket;
-using BaraoFeedback.Application.Services.TicketCategory;
-using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Infra.Querys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +39,7 @@ public class TicketController : ControllerBase
     public async Task<ActionResult<TicketResponse>> GetTicketByIdAsync(long ticketId)
     {
         var result = await _tickerService.GetTicketByIdAsync(ticketId);
-        
+
         return Ok(result);
     }
 

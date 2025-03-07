@@ -11,5 +11,7 @@ public sealed class Ticket : Entity
     public TicketCategory TicketCategory { get; set; }
     public long TicketCategoryId { get; set; } 
     public Institution Institution { get; set; }
-    public long InstitutionId { get; set; }
+    public long InstitutionId { get; set; } 
+    public Location Location { get; set; }
+    public long LocationId { get; set; }
 }
