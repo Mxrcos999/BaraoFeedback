@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options; 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 public class IdentityService : IIdentityService
 {
@@ -58,20 +59,25 @@ public class IdentityService : IIdentityService
     }
     public async Task<UserRegisterResponse> RegisterAdminAsync(string type, AdminRegisterRequest request)
     {
-        string email = request.Username + "@baraodemaua.br";
-
         var user = new ApplicationUser()
         {
-            Email = email,
+            Email = request.Email,
             Type = type,
             Name = request.Name,
-            UserName = request.Username,
+            UserName = request.Email,
         };
 
-        IdentityResult result = await _userManager.CreateAsync(user, request.Password);
+        var password = GeneratePassword();
+        IdentityResult result = await _userManager.CreateAsync(user, password);
 
-        return await ValidateRegisterAsync(result);
+        var response = await ValidateRegisterAsync(result);
 
+        if (!response.Success)
+            return response;
+
+        response.Data = password;
+
+        return response;
     }
 
     public async Task<UserRegisterResponse> RegisterStudentAsync(string type, StudentRegisterRequest userRegister)
@@ -208,6 +214,24 @@ public class IdentityService : IIdentityService
         }
 
         return claims;
+    }
+
+    public static string GeneratePassword()
+    {
+        var Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] password = new char[6];
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        {
+            byte[] randomBytes = new byte[6];
+            rng.GetBytes(randomBytes);
+
+            for (int i = 0; i < password.Length; i++)
+            {
+                int index = randomBytes[i] % Characters.Length;
+                password[i] = Characters[index];
+            }
+        }
+        return new string(password);
     }
 
 
