@@ -31,7 +31,7 @@ public class UserController : ControllerBase
     {
         var response = await _userService.UpdatePasswordAsync(model);
 
-        if (!response.Success)
+        if (!response.Sucess)
             return BadRequest(response);
 
         return Ok(response);
