@@ -22,6 +22,9 @@ public class InstitutionController : ControllerBase
     {
         var response = await _institutionService.GetInstitutionAsync();
 
+        if (!response.Sucess)
+            return BadRequest(response);
+
         return Ok(response);
     }
     [HttpPost("post-institution")]
@@ -29,12 +32,18 @@ public class InstitutionController : ControllerBase
     {
         var response = await _institutionService.PostInstitutionAsync(request);
 
+        if (!response.Sucess)
+            return BadRequest(response);
+
         return Ok(response);
     }
     [HttpDelete("delete-institution")]
     public async Task<IActionResult> DeleteInstitutionAsync(long institutionId)
     {
         var response = await _institutionService.DeleteAsync(institutionId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }
