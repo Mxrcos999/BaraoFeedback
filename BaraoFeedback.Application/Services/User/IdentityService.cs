@@ -169,16 +169,7 @@ public class IdentityService : IIdentityService
 
         return result;
 
-    }
-    public async Task<DefaultResponse> DeleteUser(string email)
-    {
-        var response = new DefaultResponse();
-        var user = await _userManager.FindByEmailAsync(email);
-         
-        await _userManager.DeleteAsync(user);
-
-        return response;
-    }
+    } 
 
     protected async Task<UserLoginResponse> GenerateCredentials(string username)
     {
