@@ -79,7 +79,14 @@ public class IdentityService : IIdentityService
 
         return response;
     }
+    public async Task<DefaultResponse> DeleteUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
 
+        await _userManager.DeleteAsync(user);
+
+        return new();
+    }
     public async Task<UserRegisterResponse> RegisterStudentAsync(string type, StudentRegisterRequest userRegister)
     {
         string email = userRegister.StudentCode + "@baraodemaua.edu.br";

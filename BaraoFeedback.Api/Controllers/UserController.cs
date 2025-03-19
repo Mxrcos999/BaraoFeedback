@@ -25,6 +25,18 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
+    [HttpDelete]
+    [Route("user/delete-user")]
+    public async Task<IActionResult> DeleteUserAsync(string userId)
+    {
+        var response = await _userService.DeleteUser(userId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
     [HttpGet]
     [Route("user/get-admin-list")]
     public async Task<IActionResult> GetUsersAsync()

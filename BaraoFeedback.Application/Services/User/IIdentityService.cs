@@ -5,6 +5,7 @@ namespace BaraoFeedback.Application.Services.User;
 
 public interface IIdentityService
 {
+    Task<DefaultResponse> DeleteUser(string id);
     Task<DefaultResponse> GetUsers();
     Task<DefaultResponse> UpdatePasswordAsync(UpdatePassword dto);
     Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin);
