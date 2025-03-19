@@ -96,6 +96,19 @@ public class IdentityService : IIdentityService
         return await ValidateRegisterAsync(result);
     }
 
+    public async Task<DefaultResponse> GetUsers()
+    {
+        var users = _userManager.Users
+            .Where(x => x.Type == "Admin")
+            .Select(u => new { u.Id, u.UserName, u.Name, u.Email })
+            .ToList();
+
+        var response = new DefaultResponse();
+
+        response.Data = users;
+
+        return response;
+    }
     public async Task<DefaultResponse> UpdatePasswordAsync(UpdatePassword dto)
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);

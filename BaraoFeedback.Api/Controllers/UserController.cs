@@ -25,6 +25,15 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet]
+    [Route("user/get-admin-list")]
+    public async Task<IActionResult> GetUsersAsync()
+    {
+        var response = await _userService.GetUsers();
+         
+        return Ok(response);
+    }
+
     [HttpPatch]
     [Route("user/update-password")]
     public async Task<IActionResult> UpdateChangeAsync(UpdatePassword model)

@@ -5,6 +5,7 @@ namespace BaraoFeedback.Application.Services.User;
 
 public interface IIdentityService
 {
+    Task<DefaultResponse> GetUsers();
     Task<DefaultResponse> UpdatePasswordAsync(UpdatePassword dto);
     Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin);
     Task<UserRegisterResponse> RegisterAdminAsync(string type, AdminRegisterRequest request);
