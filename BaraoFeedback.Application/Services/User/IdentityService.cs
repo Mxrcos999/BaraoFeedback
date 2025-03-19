@@ -99,7 +99,7 @@ public class IdentityService : IIdentityService
     public async Task<DefaultResponse> GetUsers()
     {
         var users = _userManager.Users
-            .Where(x => x.Type == "Admin")
+            .Where(x => x.Type == "admin")
             .Select(u => new { u.Id, u.UserName, u.Name, u.Email })
             .ToList();
 
