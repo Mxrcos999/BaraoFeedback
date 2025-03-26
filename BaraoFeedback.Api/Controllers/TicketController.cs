@@ -21,32 +21,45 @@ public class TicketController : ControllerBase
     [Route("post-ticket")]
     public async Task<IActionResult> PostTicketAsync(TicketInsertRequest request)
     {
-        var result = await _tickerService.PostTicketAsync(request);
-        return Ok(result);
+        var response = await _tickerService.PostTicketAsync(request);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
     }
 
     [HttpGet]
     [Route("get-ticket")]
     public async Task<ActionResult<TicketResponse>> GetTicketAsync([FromQuery] TicketQuery request)
     {
-        var result = await _tickerService.GetTicketAsync(request);
+        var response = await _tickerService.GetTicketAsync(request);
 
-        return Ok(result);
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
     }
 
     [HttpGet]
     [Route("get-ticket-by-id")]
     public async Task<ActionResult<TicketResponse>> GetTicketByIdAsync(long ticketId)
     {
-        var result = await _tickerService.GetTicketByIdAsync(ticketId);
+        var response = await _tickerService.GetTicketByIdAsync(ticketId);
 
-        return Ok(result);
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
     }
 
     [HttpDelete("delete-ticket")]
     public async Task<IActionResult> DeleteInstitutionAsync(long ticketId)
     {
         var response = await _tickerService.DeleteAsync(ticketId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }

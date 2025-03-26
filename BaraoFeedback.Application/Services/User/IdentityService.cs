@@ -2,23 +2,26 @@
 using BaraoFeedback.Application.DTOs.User;
 using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options; 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 public class IdentityService : IIdentityService
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHttpContextAccessor _httpContextAccessor; 
     private readonly JwtOptions _jwtOptions;
 
-    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions)
+    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions, IHttpContextAccessor httpContextAccessor)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
-
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin)
@@ -56,22 +59,34 @@ public class IdentityService : IIdentityService
     }
     public async Task<UserRegisterResponse> RegisterAdminAsync(string type, AdminRegisterRequest request)
     {
-        string email = request.Username + "@baraodemaua.br";
-
         var user = new ApplicationUser()
         {
-            Email = email,
+            Email = request.Email,
             Type = type,
             Name = request.Name,
-            UserName = request.Username,
+            UserName = request.Email,
         };
 
-        IdentityResult result = await _userManager.CreateAsync(user, request.Password);
+        var password = GeneratePassword();
+        IdentityResult result = await _userManager.CreateAsync(user, password);
 
-        return await ValidateRegisterAsync(result);
+        var response = await ValidateRegisterAsync(result);
 
+        if (!response.Success)
+            return response;
+
+        response.Data = password;
+
+        return response;
     }
+    public async Task<DefaultResponse> DeleteUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
 
+        await _userManager.DeleteAsync(user);
+
+        return new();
+    }
     public async Task<UserRegisterResponse> RegisterStudentAsync(string type, StudentRegisterRequest userRegister)
     {
         string email = userRegister.StudentCode + "@baraodemaua.edu.br";
@@ -87,6 +102,30 @@ public class IdentityService : IIdentityService
 
         return await ValidateRegisterAsync(result);
     }
+
+    public async Task<DefaultResponse> GetUsers()
+    {
+        var users = _userManager.Users
+            .Where(x => x.Type == "admin")
+            .Select(u => new { u.Id, u.UserName, u.Name, u.Email })
+            .ToList();
+
+        var response = new DefaultResponse();
+
+        response.Data = users;
+
+        return response;
+    }
+    public async Task<DefaultResponse> UpdatePasswordAsync(UpdatePassword dto)
+    {
+        var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+ 
+        var user = await _userManager.FindByIdAsync(userId); 
+        var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.Password); 
+
+        return new DefaultResponse();
+    }
+
     private async Task<UserRegisterResponse> ValidateRegisterAsync(IdentityResult result)
     {
 
@@ -130,16 +169,7 @@ public class IdentityService : IIdentityService
 
         return result;
 
-    }
-    public async Task<DefaultResponse> DeleteUser(string email)
-    {
-        var response = new DefaultResponse();
-        var user = await _userManager.FindByEmailAsync(email);
-         
-        await _userManager.DeleteAsync(user);
-
-        return response;
-    }
+    } 
 
     protected async Task<UserLoginResponse> GenerateCredentials(string username)
     {
@@ -195,6 +225,24 @@ public class IdentityService : IIdentityService
         }
 
         return claims;
+    }
+
+    public static string GeneratePassword()
+    {
+        var Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] password = new char[6];
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        {
+            byte[] randomBytes = new byte[6];
+            rng.GetBytes(randomBytes);
+
+            for (int i = 0; i < password.Length; i++)
+            {
+                int index = randomBytes[i] % Characters.Length;
+                password[i] = Characters[index];
+            }
+        }
+        return new string(password);
     }
 
 

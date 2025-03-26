@@ -19,6 +19,42 @@ public class UserController : ControllerBase
     {
         var response = await _userService.RegisterStudentAsync("student", request);
 
+        if (!response.Success)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpDelete]
+    [Route("user/delete-user")]
+    public async Task<IActionResult> DeleteUserAsync(string userId)
+    {
+        var response = await _userService.DeleteUser(userId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("user/get-admin-list")]
+    public async Task<IActionResult> GetUsersAsync()
+    {
+        var response = await _userService.GetUsers();
+         
+        return Ok(response);
+    }
+
+    [HttpPatch]
+    [Route("user/update-password")]
+    public async Task<IActionResult> UpdateChangeAsync(UpdatePassword model)
+    {
+        var response = await _userService.UpdatePasswordAsync(model);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
         return Ok(response);
     }
 
@@ -28,13 +64,20 @@ public class UserController : ControllerBase
     {
         var response = await _userService.RegisterAdminAsync("admin", request);
 
+        if (!response.Success)
+            return BadRequest(response);
+
         return Ok(response);
     }
+
     [HttpPost]
     [Route("user/user-login")]
     public async Task<IActionResult> LoginUserAsync(UserLoginRequest request)
     {
         var response = await _userService.LoginAsync(request);
+
+        if (!response.Success)
+            return BadRequest(response);
 
         return Ok(response);
     }

@@ -23,7 +23,10 @@ public class TicketCategoryController : ControllerBase
     public async Task<IActionResult> GetCategoriesAsync([FromQuery] TicketCategoryQuery query)
     {
         var response = await ticketCategoryService.GetTicketCategoryAsync(query);
-      
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
         return Ok(response);
     }
     [HttpGet]
@@ -31,6 +34,9 @@ public class TicketCategoryController : ControllerBase
     public async Task<IActionResult> GetCategoryAsync()
     {
         var response = await ticketCategoryService.GetCategoryAsync();
+
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }
@@ -40,12 +46,19 @@ public class TicketCategoryController : ControllerBase
     public async Task<IActionResult> PostCategoryAsync(TicketCategoryInsertRequest request)
     {
         var response = await ticketCategoryService.InsertTicketCategoryAsync(request);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
         return Ok(response);
     }
     [HttpDelete("delete-category")]
     public async Task<IActionResult> DeleteInstitutionAsync(long categoryId)
     {
         var response = await ticketCategoryService.DeleteAsync(categoryId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }
