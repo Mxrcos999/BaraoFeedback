@@ -9,7 +9,6 @@ namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
 [Route("category/")]
-[Authorize]
 public class TicketCategoryController : ControllerBase
 {
     private readonly ITicketCategoryService ticketCategoryService;
