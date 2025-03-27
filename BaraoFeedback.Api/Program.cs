@@ -40,7 +40,15 @@ namespace BaraoFeedback.Api
                         .AllowAnyHeader();
                 });
             });
-
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(80);
+                options.ListenAnyIP(443, listenOptions =>
+                {
+                    listenOptions.UseHttps("/etc/ssl/certs/selfsigned.crt",
+                                           "/etc/ssl/private/selfsigned.key");
+                });
+            });
             builder.Services.AddScoped<IIdentityService, IdentityService>();
             builder.Services.AddScoped<ITicketCategoryService, TicketCategoryService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
