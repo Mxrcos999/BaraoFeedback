@@ -47,9 +47,9 @@ namespace BaraoFeedback.Api
 
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(80); // Porta HTTP
+                options.ListenAnyIP(5000); // Porta HTTP
 
-                options.ListenAnyIP(443, listenOptions =>
+                options.ListenAnyIP(50001, listenOptions =>
                 {
                     listenOptions.UseHttps(certPath, certPassword);
                 });
