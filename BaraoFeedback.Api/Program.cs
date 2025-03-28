@@ -40,13 +40,18 @@ namespace BaraoFeedback.Api
                         .AllowAnyHeader();
                 });
             });
+
+            var kestrelConfig = builder.Configuration.GetSection("Kestrel:Endpoints:Https:Certificate");
+            string certPath = kestrelConfig.GetValue<string>("Path");
+            string certPassword = kestrelConfig.GetValue<string>("Password"); // Corrigido
+
             builder.WebHost.ConfigureKestrel(options =>
             {
-                options.ListenAnyIP(80);
+                options.ListenAnyIP(80); // Porta HTTP
+
                 options.ListenAnyIP(443, listenOptions =>
                 {
-                    listenOptions.UseHttps("/etc/ssl/certs/selfsigned.crt",
-                                           "/etc/ssl/private/selfsigned.key");
+                    listenOptions.UseHttps(certPath, certPassword);
                 });
             });
             builder.Services.AddScoped<IIdentityService, IdentityService>();

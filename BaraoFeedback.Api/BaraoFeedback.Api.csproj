@@ -21,4 +21,16 @@
     <ProjectReference Include="..\BaraoFeedback.Infra\BaraoFeedback.Infra.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="certificate.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="selfsigned.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="selfsigned.key">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
