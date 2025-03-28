@@ -49,7 +49,7 @@ namespace BaraoFeedback.Api
             {
                 options.ListenAnyIP(5000); // Porta HTTP
 
-                options.ListenAnyIP(50001, listenOptions =>
+                options.ListenAnyIP(5001, listenOptions =>
                 {
                     listenOptions.UseHttps(certPath, certPassword);
                 });
