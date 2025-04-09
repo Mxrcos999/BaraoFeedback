@@ -41,6 +41,19 @@ namespace BaraoFeedback.Api
                 });
             });
 
+            var kestrelConfig = builder.Configuration.GetSection("Kestrel:Endpoints:Https:Certificate");
+            string certPath = kestrelConfig.GetValue<string>("Path");
+            string certPassword = kestrelConfig.GetValue<string>("Password"); // Corrigido
+
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ListenAnyIP(5000); // Porta HTTP
+
+                options.ListenAnyIP(5001, listenOptions =>
+                {
+                    listenOptions.UseHttps(certPath, certPassword);
+                });
+            });
             builder.Services.AddScoped<IIdentityService, IdentityService>();
             builder.Services.AddScoped<ITicketCategoryService, TicketCategoryService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
