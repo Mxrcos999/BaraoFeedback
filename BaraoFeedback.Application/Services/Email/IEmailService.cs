@@ -1,8 +1,9 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
+using BaraoFeedback.Application.DTOs.Ticket;
 
 namespace BaraoFeedback.Application.Services.Email;
 
 public interface IEmailService
 {
-    DefaultResponse SendEmail(string nome, string destinatarios);
+    Task<DefaultResponse> SendEmail(TicketResponse ticket);
 }

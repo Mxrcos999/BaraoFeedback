@@ -1,92 +1,73 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
+using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Services.Email;
+using BaraoFeedback.Application.Services.User;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BaraoFeedback.Application.Services.Email;
 
 public class EmailService : IEmailService
 {
     private readonly EmailSenderOptions _options;
+    private readonly IIdentityService _service;
 
-    public EmailService(IOptions<EmailSenderOptions> options)
+    public EmailService(IOptions<EmailSenderOptions> options, IIdentityService service)
     {
         _options = options.Value;
+        _service = service;
     }
     private SmtpClient ObterClient()
     {
-        var client = new SmtpClient("smtp.titan.email", 587)
+        var client = new SmtpClient("smtp.office365.com", 587)
         {
-            Credentials = new System.Net.NetworkCredential("suporte@paintballtropadechoque.com", "Quita123*"),
-            EnableSsl = true
+            Credentials = new System.Net.NetworkCredential("fabricadesoftware@baraodemaua.edu.br", "=Eup@5b+"),
+            EnableSsl = true 
         };
         return client;
-
+    }
+    private string GerarCorpoEmail(TicketResponse ticket)
+    {
+        return $@"
+        <html>
+        <body style='font-family: Arial, sans-serif;'>
+            <h2 style='color: #2e6c80;'>Novo Chamado Recebido</h2>
+            <p><strong>ID do Chamado:</strong> {ticket.TicketId}</p>
+            <p><strong>Título:</strong> {ticket.Title}</p>
+            <p><strong>Descrição:</strong><br />{ticket.Description}</p>
+            <hr />
+            <p><strong>Aluno:</strong> {ticket.StudentName} ({ticket.StudentCode})</p>
+            <p><strong>Instituição:</strong> {ticket.InstitutionName}</p>
+            <p><strong>Local:</strong> {ticket.LocationName}</p>
+            <p><strong>Categoria:</strong> {ticket.CategoryName}</p>
+            <p><strong>Data de Abertura:</strong> {ticket.CreatedAt}</p>
+        </body>
+        </html>";
     }
 
-    private SmtpClient ObterClientTeste()
-    {
-        var client = new SmtpClient("smtp.titan.email", 587)
-        {
-            Credentials = new System.Net.NetworkCredential("", ""),
-            EnableSsl = true
-        };
-        return client;
 
-    }
-
-    public DefaultResponse SendEmail(string nome, string destinatarios)
-    {
-        if (string.IsNullOrEmpty(destinatarios) ||
-        string.IsNullOrEmpty(nome))
-        {
-            throw new ArgumentException("Os parâmetros remetente, destinatário, assunto e corpoo do email são obrigatórios.");
-        }
-        var listaDestinatarios = destinatarios.Split(",");
+    public async Task<DefaultResponse> SendEmail(TicketResponse ticket)
+    { 
+        var listaDestinatarios = await _service.GetEmailsAdmin();
         var response = new DefaultResponse();
 
         try
         {
-            using (var mm = new MailMessage("suporte@.com", listaDestinatarios[0]))
+            using (var mm = new MailMessage("fabricadesoftware@baraodemaua.edu.br", listaDestinatarios[0]))
             {
                 foreach (var emailAtual in listaDestinatarios)
                 {
-                    mm.To.Add(new MailAddress(emailAtual.TrimStart().TrimEnd()));
+                    string padrao = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+                    if(Regex.IsMatch(emailAtual, padrao))
+                    {
+                        mm.To.Add(new MailAddress(emailAtual.TrimStart().TrimEnd()));
+                    }
                 }
-                mm.Subject = $"Seu agendamento esta quase concluído!";
+                mm.Subject = $"Novo chamado #{ticket.TicketId}";
                 mm.IsBodyHtml = true;
-                mm.Body = @$"
-                    <html>
-                    <head>
-                        <style>
-                            .content {{
-                                justify-content: center;
-                                align-items: center;
-                                text-align: center;
-                            }}
-                            .payment-button {{
-                                color: white;
-                                background-color: black;
-                                padding: 10px 20px;
-                                text-decoration: none;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class='content'>
-                            <h3>Olá, {nome}<br>Seu agendamento está quase concluído.</h3>
-                            <img src='https://paintballstorage.blob.core.windows.net/imagespaintball/logo-paintball.jpg' alt='logo' width='300' height='200'>
-
-                            <p>Por favor, efetue seu pagamento para finalizar o agendamento clicando no botão abaixo:</p>
-                            <br>
-                            <br>
-                            <a  class='payment-button'>Efetuar pagamento</a>
-                            <br>
-                            <br>
-                        </div>
-                    </body>
-                    </html>";
+                mm.Body = GerarCorpoEmail(ticket);
 
                 mm.BodyEncoding = Encoding.GetEncoding("UTF-8");
                 using (var client = ObterClient())

@@ -24,6 +24,12 @@ public class IdentityService : IIdentityService
         _httpContextAccessor = httpContextAccessor;
     }
 
+    public async Task<string[]> GetEmailsAdmin()
+    {
+        var emails = _userManager.Users.Where(x => x.Type == "admin").Select(x => x.Email).ToArray();
+
+        return emails;
+    }
     public async Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(userLogin.UserName, userLogin.Password, isPersistent: false, lockoutOnFailure: true);

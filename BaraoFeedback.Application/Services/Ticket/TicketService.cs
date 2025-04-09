@@ -44,9 +44,11 @@ public class TicketService : ITicketService
             LocationId = request.LocationId,
             Title = request.Title, 
         };
-        response.Data = await _ticketRepository.PostTicketAsync(entity);
+        var result = await _ticketRepository.PostTicketAsync(entity);
+        response.Data = result;
 
-   //     _emailService.SendEmail("Marcos", "marcosfelipehd4@gmail.com");
+        var ticket = await _ticketRepository.GetTicketByIdAsync(entity.Id);
+        await _emailService.SendEmail(ticket);
 
         return response;
     }
