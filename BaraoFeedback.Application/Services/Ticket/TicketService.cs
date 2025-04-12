@@ -37,7 +37,7 @@ public class TicketService : ITicketService
         var response = new DefaultResponse();
         var entity = new Domain.Entities.Ticket()
         {
-            ApplicationUserId = _ticketRepository.GetUserId(),
+            ApplicationUserId = "2032a7cf-3da5-4940-8f54-2f0174120c2d",//_ticketRepository.GetUserId(),
             Description = request.Description,
             InstitutionId = request.InstitutionId,
             TicketCategoryId = request.CategoryId,

@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
-[Route("/ticket")]
-[Authorize]
+[Route("/ticket")] 
 public class TicketController : ControllerBase
 {
     private readonly ITicketService _tickerService;

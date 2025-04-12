@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaraoFeedback.Api.Controllers;
 
-[ApiController]
-[Authorize]
+[ApiController] 
 [Route("institution/")]
 public class InstitutionController : ControllerBase
 {
