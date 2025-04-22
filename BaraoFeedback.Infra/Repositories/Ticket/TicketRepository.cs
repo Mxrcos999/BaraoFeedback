@@ -53,6 +53,7 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
                            InstitutionName = data.Institution.Name,
                            LocationName = data.Location.Name,
                            Title = data.Title,
+                           StudendMail = data.ApplicationUser.Email,
                            StudentCode = data.ApplicationUser.UserName,
                            StudentName = data.ApplicationUser.Name,
                            TicketId = data.Id,
