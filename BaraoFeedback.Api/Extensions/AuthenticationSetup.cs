@@ -44,10 +44,11 @@ public static class AuthenticationSetup
 
         //Requisitos de geração de senha senha
         services.Configure<IdentityOptions>(options => {
+            options.SignIn.RequireConfirmedEmail = true;
             options.Password.RequireDigit = false;
             options.Password.RequireLowercase = false;
             options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
+            options.Password.RequireUppercase = false; 
             options.Password.RequiredLength = 4;
             options.Password.RequiredUniqueChars = 0;
         });

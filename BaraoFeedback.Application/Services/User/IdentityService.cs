@@ -1,35 +1,35 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.DTOs.User;
+using BaraoFeedback.Application.Services.Email;
 using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options; 
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Policy; 
 
 public class IdentityService : IIdentityService
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor; 
+    private readonly IEmailService _emailSender; 
     private readonly JwtOptions _jwtOptions;
 
-    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions, IHttpContextAccessor httpContextAccessor)
+    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions, IHttpContextAccessor httpContextAccessor, IEmailService emailSender)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
         _httpContextAccessor = httpContextAccessor;
+        _emailSender = emailSender;
     }
 
-    public async Task<string[]> GetEmailsAdmin()
-    {
-        var emails = _userManager.Users.Where(x => x.Type == "admin").Select(x => x.Email).ToArray();
-
-        return emails;
-    }
+ 
     public async Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(userLogin.UserName, userLogin.Password, isPersistent: false, lockoutOnFailure: true);
@@ -82,6 +82,7 @@ public class IdentityService : IIdentityService
             return response;
 
         response.Data = password;
+        var link = await SendConfirmMail(user.Email);
 
         return response;
     }
@@ -249,6 +250,34 @@ public class IdentityService : IIdentityService
             }
         }
         return new string(password);
+    }
+
+    public async Task<string> SendConfirmMail(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return null;
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        var encodedToken = WebUtility.UrlEncode(token);
+         
+        var confirmationLink = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/user/ConfirmEmail?userId={user.Id}&token={encodedToken}";
+        await _emailSender.SendConfirmMail(email, user.Name, confirmationLink);
+        return confirmationLink;
+    }
+
+    public async Task<bool> UnlockUser(string userId, string token)
+    { 
+        var user = await _userManager.FindByIdAsync(userId);
+
+        token = WebUtility.UrlDecode(token);
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+
+        if (result.Succeeded)
+            return true;
+
+        return false;
     }
 
 

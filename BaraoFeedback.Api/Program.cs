@@ -1,4 +1,3 @@
-
 using BaraoFeedback.Api.Extensions;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Application.Services.Email;
@@ -9,10 +8,10 @@ using BaraoFeedback.Application.Services.TicketCategory;
 using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Infra.Context;
-using BaraoFeedback.Infra.Repositories;
 using BaraoFeedback.Infra.Repositories.Location;
 using BaraoFeedback.Infra.Repositories.Ticket;
 using BaraoFeedback.Infra.Repositories.TicketCategory;
+using BaraoFeedback.Infra.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,12 +24,11 @@ namespace BaraoFeedback.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSwagger();
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", builder =>
@@ -41,19 +39,6 @@ namespace BaraoFeedback.Api
                 });
             });
 
-            var kestrelConfig = builder.Configuration.GetSection("Kestrel:Endpoints:Https:Certificate");
-            string certPath = kestrelConfig.GetValue<string>("Path");
-            string certPassword = kestrelConfig.GetValue<string>("Password"); // Corrigido
-
-            builder.WebHost.ConfigureKestrel(options =>
-            {
-                options.ListenAnyIP(5000); // Porta HTTP
-
-                options.ListenAnyIP(5001, listenOptions =>
-                {
-                    listenOptions.UseHttps(certPath, certPassword);
-                });
-            });
             builder.Services.AddScoped<IIdentityService, IdentityService>();
             builder.Services.AddScoped<ITicketCategoryService, TicketCategoryService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
@@ -66,7 +51,7 @@ namespace BaraoFeedback.Api
             builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 
             builder.Services.AddDbContext<BaraoFeedbackContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                .AddRoles<IdentityRole>()
@@ -80,16 +65,15 @@ namespace BaraoFeedback.Api
 
             var app = builder.Build();
 
-
             app.UseSwagger();
-            app.UseSwaggerUI(); 
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
-            app.UseAuthentication();
-            app.UseAuthorization(); 
-            
             app.UseCors("AllowAll");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 
