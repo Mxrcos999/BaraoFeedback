@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("location/")]
 public class LocationController : ControllerBase
 {

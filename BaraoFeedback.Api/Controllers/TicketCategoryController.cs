@@ -1,5 +1,4 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
-using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Services.TicketCategory;
 using BaraoFeedback.Infra.Querys;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("category/")]
 public class TicketCategoryController : ControllerBase
 {
