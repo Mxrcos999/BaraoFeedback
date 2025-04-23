@@ -276,8 +276,9 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByIdAsync(userId);
 
         token = WebUtility.UrlDecode(token);
+        user.EmailConfirmed = true;
 
-        var result = await _userManager.ConfirmEmailAsync(user, token);
+        var result = await _userManager.UpdateAsync(user);
 
         if (result.Succeeded)
             return true;
