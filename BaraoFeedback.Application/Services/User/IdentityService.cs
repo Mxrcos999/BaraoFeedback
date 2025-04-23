@@ -266,7 +266,7 @@ public class IdentityService : IIdentityService
 
         var encodedToken = WebUtility.UrlEncode(token);
          
-        var confirmationLink = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/user/ConfirmEmail?userId={user.Id}&token={encodedToken}";
+        var confirmationLink = $"https://baraotickets-dxcafcc6h9h0aga6.eastus2-01.azurewebsites.net/user/ConfirmEmail?userId={user.Id}&token={encodedToken}";
         await _emailSender.SendConfirmMail(email, user.Name, confirmationLink);
         return confirmationLink;
     }
