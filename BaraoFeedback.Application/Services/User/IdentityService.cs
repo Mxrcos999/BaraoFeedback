@@ -76,13 +76,13 @@ public class IdentityService : IIdentityService
         var password = GeneratePassword();
         IdentityResult result = await _userManager.CreateAsync(user, password);
 
-        var response = await ValidateRegisterAsync(result);
+        var response = await ValidateRegisterAsync(result, user.Email);
 
         if (!response.Success)
             return response;
 
         response.Data = password;
-        var link = await SendConfirmMail(user.Email);
+        await SendConfirmMail(user.Email);
 
         return response;
     }
@@ -107,7 +107,10 @@ public class IdentityService : IIdentityService
 
         IdentityResult result = await _userManager.CreateAsync(user, userRegister.Password);
 
-        return await ValidateRegisterAsync(result);
+        if(result.Succeeded)
+            await SendConfirmMail(email);
+
+        return await ValidateRegisterAsync(result, email);
     }
 
     public async Task<DefaultResponse> GetUsers()
@@ -133,7 +136,7 @@ public class IdentityService : IIdentityService
         return new DefaultResponse();
     }
 
-    private async Task<UserRegisterResponse> ValidateRegisterAsync(IdentityResult result)
+    private async Task<UserRegisterResponse> ValidateRegisterAsync(IdentityResult result, string email)
     {
 
         UserRegisterResponse userRegisterResponse = new UserRegisterResponse(result.Succeeded);
@@ -157,7 +160,9 @@ public class IdentityService : IIdentityService
                         break;
 
                     case "DuplicateUserName":
-                        userRegisterResponse.Errors.AddError("O email informado já foi cadastrado!");
+                        userRegisterResponse.Errors.AddError("O email informado já foi cadastrado! Verifique seu email institucional para ativar a conta.");
+                        await SendConfirmMail(email);
+
                         break;
 
                     default:
