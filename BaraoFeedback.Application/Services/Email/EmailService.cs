@@ -74,7 +74,70 @@ public class EmailService : IEmailService
         </body>
     </html>";
     }
+    public string GeneratePasswordEmailBody(string name, string password)
+    {
+        string body = $@"<html>
+              <body style=""font-family: Arial, sans-serif; color: #333;"">
+                <h2>Conta de Administrador Criada com Sucesso</h2>
+                <p>Olá,</p>
+                <p>A conta de administrador foi criada com sucesso em nosso sistema.</p>
+                <p><strong>Dados de acesso:</strong></p>
+                <ul>
+                  <li><strong>Usuário:</strong> {name}</li>
+                  <li><strong>Senha:</strong> {password}</li>
+                </ul>
+                <p>Recomendamos que a senha seja alterada após o primeiro acesso para garantir a segurança da conta.</p>
+                <p>Se você tiver qualquer dúvida ou problema, entre em contato com a equipe de suporte.</p>
+                <p>Atenciosamente,<br/>Equipe de Suporte</p>
+              </body>
+            </html>
+            ";
 
+        return body;
+    }
+    public async Task<DefaultResponse> SendPassword(string mail, string name, string password)
+    {
+        var response = new DefaultResponse();
+
+        try
+        {
+            using (var mm = new MailMessage("fabricadesoftware@baraodemaua.edu.br", mail))
+            {
+                mm.To.Add(new MailAddress(mail));
+
+                mm.Subject = $"Conta criada com sucesso!";
+                mm.IsBodyHtml = true;
+                mm.Body = GeneratePasswordEmailBody(name, password);
+
+                mm.BodyEncoding = Encoding.GetEncoding("UTF-8");
+                using (var client = ObterClient())
+                {
+                    client.Send(mm);
+                }
+
+                return response;
+            }
+        }
+        catch (SmtpFailedRecipientsException ex)
+        {
+            List<string> destinatariosInvalidos = new List<string>();
+            foreach (var failedRecipient in ex.InnerExceptions)
+            {
+                if (failedRecipient is SmtpFailedRecipientException failedRecipientEx)
+                {
+                    destinatariosInvalidos.Add(failedRecipientEx.FailedRecipient);
+                }
+            }
+            response.Errors.AddError($"Email a seguir é inválido: {string.Join(", ", destinatariosInvalidos.Distinct())}");
+
+            return response;
+
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
     public async Task<DefaultResponse> SendConfirmMail(string mail, string name, string link)
     {
         var response = new DefaultResponse();

@@ -7,4 +7,5 @@ public interface IEmailService
 {
     Task<DefaultResponse> SendConfirmMail(string mail, string name, string link);
     Task<DefaultResponse> SendEmail(TicketResponse ticket);
+    Task<DefaultResponse> SendPassword(string mail, string name, string password);
 }

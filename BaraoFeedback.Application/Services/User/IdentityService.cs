@@ -73,6 +73,8 @@ public class IdentityService : IIdentityService
             UserName = request.Email,
         };
 
+        user.EmailConfirmed = true;
+
         var password = GeneratePassword();
         IdentityResult result = await _userManager.CreateAsync(user, password);
 
@@ -82,7 +84,7 @@ public class IdentityService : IIdentityService
             return response;
 
         response.Data = password;
-        await SendConfirmMail(user.Email);
+        await _emailSender.SendPassword(user.Email, user.Name, password);
 
         return response;
     }
