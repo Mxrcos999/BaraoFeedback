@@ -5,9 +5,8 @@ using System.Linq.Expressions;
 
 namespace BaraoFeedback.Infra.Querys;
 
-public class TicketQuery
+public class TicketQuery : BaseGetRequest
 {
-    public BaseGetRequest BaseGetRequest { get; set; }
     public long? InstitutionId { get; set; }
     public long? LocationId { get; set; }
     public long? CategoryId { get; set; }

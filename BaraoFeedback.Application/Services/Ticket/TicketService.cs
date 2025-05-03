@@ -20,12 +20,13 @@ public class TicketService : ITicketService
     public async Task<BaseResponse<List<TicketResponse>>> GetTicketAsync(TicketQuery query)
     {
         var response = new BaseResponse<List<TicketResponse>>();
-        var data = (await _ticketRepository.GetTicketAsync(query)).Pagination<TicketResponse>(query.BaseGetRequest);
+        var data = (await _ticketRepository.GetTicketAsync(query))
+            .Pagination<TicketResponse>(new BaseGetRequest() { Page = query.Page, PageSize = query.PageSize, SearchInput = query.SearchInput});
         var totalRecord = (await _ticketRepository.GetTicketAsync(query)).Count();
         
         response.TotalRecords = totalRecord;
         response.PageSize = data.Count();
-        response.Page = query.BaseGetRequest.Page;  
+        response.Page = query.Page;  
         response.Data = data.ToList();
         return response;
     }
