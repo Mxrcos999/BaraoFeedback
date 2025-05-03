@@ -32,6 +32,20 @@ public class TicketService : ITicketService
 
         return response;
     }
+    public async Task<DefaultResponse> ProcessTicketAsync(long id)
+    {
+        var response = new DefaultResponse();
+
+        var ticket = new Domain.Entities.Ticket()
+        {
+            Id = id,
+            Processed = true
+        };
+
+        response.Data = await _ticketRepository.UpdateAsync(ticket, default);
+
+        return response;
+    }
     public async Task<DefaultResponse> PostTicketAsync(TicketInsertRequest request)
     {
         var response = new DefaultResponse();

@@ -1,7 +1,5 @@
 ﻿using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.DTOs.Ticket;
-using BaraoFeedback.Application.Services.Email;
-using BaraoFeedback.Application.Services.User;
 using BaraoFeedback.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -21,222 +19,179 @@ public class EmailService : IEmailService
         _options = options.Value;
         _userManager = userManager;
     }
+
     private SmtpClient ObterClient()
     {
-        var client = new SmtpClient("smtp.office365.com", 587)
+        return new SmtpClient("smtp.office365.com", 587)
         {
             Credentials = new System.Net.NetworkCredential("fabricadesoftware@baraodemaua.edu.br", "=Eup@5b+"),
-            EnableSsl = true 
+            EnableSsl = true
         };
-        return client;
     }
-    private string GerarCorpoEmail(TicketResponse ticket)
+
+    #region Métodos Públicos
+
+    public async Task<DefaultResponse> SendPassword(string email, string userName, string password)
     {
-        return $@"
-        <html>
-        <body style='font-family: Arial, sans-serif;'>
-            <h2 style='color: #2e6c80;'>Novo Chamado Recebido</h2>
-            <p><strong>ID do Chamado:</strong> {ticket.TicketId}</p> 
-            <p><strong>Descrição:</strong><br />{ticket.Description}</p>
-            <hr />
-            <p><strong>Aluno:</strong> {ticket.Title}</p>
-            <p><strong>Instituição:</strong> {ticket.InstitutionName}</p>
-            <p><strong>Local:</strong> {ticket.LocationName}</p>
-            <p><strong>Categoria:</strong> {ticket.CategoryName}</p>
-            <p><strong>Data de Abertura:</strong> {ticket.CreatedAt}</p>
-        </body>
-        </html>";
+        string subject = "Conta criada com sucesso!";
+        string body = EmailTemplates.GeneratePasswordEmailBody(userName, password);
+        return await EnviarEmail(email, subject, body);
     }
-    public static string GenerateConfirmationEmailBody(string userName, string confirmationLink)
+
+    public async Task<DefaultResponse> SendConfirmMail(string email, string userName, string confirmationLink)
     {
-        return $@"
-    <html>
-        <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>
-            <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);'>
-                <h2 style='color: #333333;'>Olá, {userName}!</h2>
-                <p style='color: #555555; font-size: 16px;'>
-                    Obrigado por se registrar. Para ativar sua conta, clique no botão abaixo para confirmar seu e-mail:
-                </p>
-                <a href='{confirmationLink}' 
-                   style='display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;'>
-                    Confirmar E-mail
-                </a>
-                <p style='color: #555555; font-size: 14px; margin-top: 30px;'>
-                    Ou copie e cole o seguinte link no seu navegador:
-                </p>
-                <p style='word-break: break-all; color: #007bff; font-size: 14px;'>
-                    <a href='{confirmationLink}' style='color: #007bff;'>{confirmationLink}</a>
-                </p>
-                <p style='margin-top: 40px; font-size: 12px; color: #999999;'>
-                    Se você não criou esta conta, pode ignorar este e-mail.
-                </p>
-            </div>
-        </body>
-    </html>";
+        string subject = "Confirme seu email";
+        string body = EmailTemplates.GenerateConfirmationEmailBody(userName, confirmationLink);
+        return await EnviarEmail(email, subject, body);
     }
-    public string GeneratePasswordEmailBody(string name, string password)
+
+    public async Task<DefaultResponse> SendForgotPasswordEmail(string email, string userName, string password)
     {
-        string body = $@"<html>
-              <body style=""font-family: Arial, sans-serif; color: #333;"">
-                <h2>Conta de Administrador Criada com Sucesso</h2>
-                <p>Olá,</p>
-                <p>A conta de administrador foi criada com sucesso em nosso sistema.</p>
-                <p><strong>Dados de acesso:</strong></p>
-                <ul>
-                  <li><strong>Usuário:</strong> {name}</li>
-                  <li><strong>Senha:</strong> {password}</li>
-                </ul>
-                <p>Recomendamos que a senha seja alterada após o primeiro acesso para garantir a segurança da conta.</p>
-                <p>Se você tiver qualquer dúvida ou problema, entre em contato com a equipe de suporte.</p>
-                <p>Atenciosamente,<br/>Equipe de Suporte</p>
-              </body>
-            </html>
-            ";
-
-        return body;
-    }
-    public async Task<DefaultResponse> SendPassword(string mail, string name, string password)
-    {
-        var response = new DefaultResponse();
-
-        try
-        {
-            using (var mm = new MailMessage("fabricadesoftware@baraodemaua.edu.br", mail))
-            {
-                mm.To.Add(new MailAddress(mail));
-
-                mm.Subject = $"Conta criada com sucesso!";
-                mm.IsBodyHtml = true;
-                mm.Body = GeneratePasswordEmailBody(name, password);
-
-                mm.BodyEncoding = Encoding.GetEncoding("UTF-8");
-                using (var client = ObterClient())
-                {
-                    client.Send(mm);
-                }
-
-                return response;
-            }
-        }
-        catch (SmtpFailedRecipientsException ex)
-        {
-            List<string> destinatariosInvalidos = new List<string>();
-            foreach (var failedRecipient in ex.InnerExceptions)
-            {
-                if (failedRecipient is SmtpFailedRecipientException failedRecipientEx)
-                {
-                    destinatariosInvalidos.Add(failedRecipientEx.FailedRecipient);
-                }
-            }
-            response.Errors.AddError($"Email a seguir é inválido: {string.Join(", ", destinatariosInvalidos.Distinct())}");
-
-            return response;
-
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
-    }
-    public async Task<DefaultResponse> SendConfirmMail(string mail, string name, string link)
-    {
-        var response = new DefaultResponse();
-
-        try
-        {
-            using (var mm = new MailMessage("fabricadesoftware@baraodemaua.edu.br", mail))
-            {
-                mm.To.Add(new MailAddress(mail));
-
-                mm.Subject = $"Confirme seu email";
-                mm.IsBodyHtml = true;
-                mm.Body = GenerateConfirmationEmailBody(name, link);
-
-                mm.BodyEncoding = Encoding.GetEncoding("UTF-8");
-                using (var client = ObterClient())
-                {
-                    client.Send(mm);
-                }
-
-                return response;
-            }
-        }
-        catch (SmtpFailedRecipientsException ex)
-        {
-            List<string> destinatariosInvalidos = new List<string>();
-            foreach (var failedRecipient in ex.InnerExceptions)
-            {
-                if (failedRecipient is SmtpFailedRecipientException failedRecipientEx)
-                {
-                    destinatariosInvalidos.Add(failedRecipientEx.FailedRecipient);
-                }
-            }
-            response.Errors.AddError($"Email a seguir é inválido: {string.Join(", ", destinatariosInvalidos.Distinct())}");
-
-            return response;
-
-        }
-        catch (Exception ex)
-        {
-            throw ex;
-        }
+        string subject = "Redefinição de Senha - Barao Feedback";
+        string body = EmailTemplates.GenerateForgotPasswordEmailBody(userName, password);
+        return await EnviarEmail(email, subject, body);
     }
 
     public async Task<DefaultResponse> SendEmail(TicketResponse ticket)
     {
-        var listaDestinatarios = _userManager.Users.Where(x => x.Type == "admin").Select(x => x.Email).ToArray();
+        var destinatarios = _userManager.Users
+            .Where(x => x.Type == "admin")
+            .Select(x => x.Email)
+            .Where(IsValidEmail)
+            .ToArray();
+
+        var response = new DefaultResponse();
+        if (!destinatarios.Any())
+        {
+            response.Errors.AddError("Nenhum administrador com e-mail válido encontrado.");
+            return response;
+        }
+
+        string subject = $"Novo chamado #{ticket.TicketId}";
+        string body = EmailTemplates.GenerateTicketEmailBody(ticket);
+        return await EnviarEmail(destinatarios, subject, body);
+    }
+
+    #endregion
+
+    #region Auxiliares
+
+    private async Task<DefaultResponse> EnviarEmail(string destinatario, string assunto, string corpo)
+    {
+        return await EnviarEmail(new[] { destinatario }, assunto, corpo);
+    }
+
+    private async Task<DefaultResponse> EnviarEmail(string[] destinatarios, string assunto, string corpo)
+    {
         var response = new DefaultResponse();
 
         try
         {
-            using (var mm = new MailMessage("fabricadesoftware@baraodemaua.edu.br", listaDestinatarios[0]))
+            using var message = new MailMessage
             {
-                foreach (var emailAtual in listaDestinatarios)
-                {
-                    string padrao = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-                    if(Regex.IsMatch(emailAtual, padrao))
-                    {
-                        mm.To.Add(new MailAddress(emailAtual.TrimStart().TrimEnd()));
-                    }
-                }
-                mm.Subject = $"Novo chamado #{ticket.TicketId}";
-                mm.IsBodyHtml = true;
-                mm.Body = GerarCorpoEmail(ticket);
+                From = new MailAddress("fabricadesoftware@baraodemaua.edu.br"),
+                Subject = assunto,
+                Body = corpo,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8
+            };
 
-                mm.BodyEncoding = Encoding.GetEncoding("UTF-8");
-                using (var client = ObterClient())
-                {
-                    client.Send(mm);
-                } 
-
-                return response;
+            foreach (var destinatario in destinatarios.Distinct())
+            {
+                if (IsValidEmail(destinatario))
+                    message.To.Add(destinatario.Trim());
             }
+
+            using var client = ObterClient();
+            client.Send(message);
         }
         catch (SmtpFailedRecipientsException ex)
         {
-            List<string> destinatariosInvalidos = new List<string>();
-            foreach (var failedRecipient in ex.InnerExceptions)
-            {
-                if (failedRecipient is SmtpFailedRecipientException failedRecipientEx)
-                {
-                    destinatariosInvalidos.Add(failedRecipientEx.FailedRecipient);
-                }
-            }
-            response.Errors.AddError($"Email a seguir é inválido: {string.Join(", ", destinatariosInvalidos.Distinct())}");
-             
-            return response;
+            var invalidRecipients = ex.InnerExceptions
+                .OfType<SmtpFailedRecipientException>()
+                .Select(e => e.FailedRecipient)
+                .Distinct();
 
+            response.Errors.AddError($"Email(s) inválido(s): {string.Join(", ", invalidRecipients)}");
         }
         catch (Exception ex)
         {
-            throw ex;
+            response.Errors.AddError($"Erro ao enviar e-mail: {ex.Message}");
         }
 
+        return response;
     }
 
+    private bool IsValidEmail(string email)
+    {
+        var pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        return Regex.IsMatch(email, pattern);
+    }
 
+    #endregion
 }
 
+public static class EmailTemplates
+{
+    public static string GeneratePasswordEmailBody(string userName, string password) => $@"
+        <html>
+            <body style=""font-family: Arial, sans-serif; color: #333;"">
+                <h2>Conta de Administrador Criada com Sucesso</h2>
+                <p>Olá {userName},</p>
+                <p>Sua conta de administrador foi criada com sucesso.</p>
+                <p><strong>Usuário:</strong> {userName}<br/><strong>Senha:</strong> {password}</p>
+                <p>Recomendamos alterar sua senha no primeiro acesso.</p>
+                <p>Atenciosamente,<br/>Equipe de Suporte</p>
+            </body>
+        </html>";
+
+    public static string GenerateConfirmationEmailBody(string userName, string confirmationLink) => $@"
+        <html>
+            <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>
+                <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);'>
+                    <h2>Olá, {userName}!</h2>
+                    <p>Para ativar sua conta, clique no botão abaixo:</p>
+                    <a href='{confirmationLink}' style='padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;'>Confirmar E-mail</a>
+                    <p>Ou copie e cole o link no navegador:</p>
+                    <p><a href='{confirmationLink}'>{confirmationLink}</a></p>
+                    <p>Se você não criou essa conta, ignore este e-mail.</p>
+                </div>
+            </body>
+        </html>";
+
+    public static string GenerateForgotPasswordEmailBody(string userName, string newPassword) => $@"
+    <html>
+        <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>
+            <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);'>
+                <h2>Olá, {userName}!</h2>
+                <p>Recebemos uma solicitação para redefinir sua senha.</p>
+                <p><strong>Sua nova senha:</strong></p>
+                <div style='background-color: #f1f1f1; padding: 10px 15px; border-radius: 5px; font-weight: bold; margin: 10px 0; font-size: 16px;'>
+                    {newPassword}
+                </div>
+                <p>Você pode usar essa senha para acessar sua conta e, se desejar, alterá-la nas configurações do seu perfil.</p>
+                <a href='https://barao-tickets-ui.vercel.app/login' style='display: inline-block; margin-top: 20px; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;'>Acessar Plataforma</a>
+                <p style='margin-top: 30px; font-size: 12px; color: #999;'>Se você não solicitou essa redefinição, pode ignorar este e-mail.</p>
+            </div>
+        </body>
+    </html>";
+
+
+    public static string GenerateTicketEmailBody(TicketResponse ticket) => $@"
+        <html>
+            <body style='font-family: Arial, sans-serif;'>
+                <h2 style='color: #2e6c80;'>Novo Chamado Recebido</h2>
+                <p><strong>ID do Chamado:</strong> {ticket.TicketId}</p>
+                <p><strong>Descrição:</strong><br />{ticket.Description}</p>
+                <hr />
+                <p><strong>Aluno:</strong> {ticket.Title}</p>
+                <p><strong>Instituição:</strong> {ticket.InstitutionName}</p>
+                <p><strong>Local:</strong> {ticket.LocationName}</p>
+                <p><strong>Categoria:</strong> {ticket.CategoryName}</p>
+                <p><strong>Data de Abertura:</strong> {ticket.CreatedAt}</p>
+            </body>
+        </html>";
+}
 
 public class EmailSenderOptions
 {

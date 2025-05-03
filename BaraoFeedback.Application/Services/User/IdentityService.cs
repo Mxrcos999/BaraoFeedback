@@ -17,19 +17,35 @@ public class IdentityService : IIdentityService
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor; 
-    private readonly IEmailService _emailSender; 
+    private readonly IEmailService _emailSender;
+    private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
     private readonly JwtOptions _jwtOptions;
 
-    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions, IHttpContextAccessor httpContextAccessor, IEmailService emailSender)
+    public IdentityService(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions, IHttpContextAccessor httpContextAccessor, IEmailService emailSender, IPasswordHasher<ApplicationUser> passwordHasher)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
         _httpContextAccessor = httpContextAccessor;
         _emailSender = emailSender;
+        _passwordHasher = passwordHasher;
     }
 
- 
+    public async Task<DefaultResponse> UpdateNameAsync(UpdateUserRequest model)
+    {
+        var response = new DefaultResponse();
+
+        var user = await _userManager.FindByIdAsync(model.UserId);
+
+        user.Name = model.Name;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            response.Errors.AddError("Erro ao alterar nome do usuário");
+
+        return response;
+    }
     public async Task<UserLoginResponse> LoginAsync(UserLoginRequest userLogin)
     {
         SignInResult signInResult = await _signInManager.PasswordSignInAsync(userLogin.UserName, userLogin.Password, isPersistent: false, lockoutOnFailure: true);
@@ -288,5 +304,45 @@ public class IdentityService : IIdentityService
         return false;
     }
 
+    public async Task<DefaultResponse> ForgotPassword(ForgotPasswordDto model)
+    {
+        var response = new DefaultResponse();
+        var user = await _userManager.FindByEmailAsync(model.Email);
 
+        if (user == null)
+        {
+            response.Errors.AddError("Usuário não encontrado.");
+            return response;
+        }
+
+        var novaSenha = GeneratePassword();
+
+        var hash = _passwordHasher.HashPassword(user, novaSenha);
+        user.PasswordHash = hash;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                response.Errors.AddError(error.Description);
+            return response;
+        }
+        await _emailSender.SendForgotPasswordEmail(model.Email, user.Name, novaSenha);
+
+        return response;
+    }
+    private string GeneratePassword(int length = 10)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%&";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+
+}
+
+public class ForgotPasswordDto
+{
+    public string Email { get; set; }
 }

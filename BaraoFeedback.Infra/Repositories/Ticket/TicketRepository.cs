@@ -28,6 +28,7 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
                        {
                            CategoryName = data.TicketCategory.Description,
                            Description = data.Description,
+                           Processed = data.Processed,
                            CreatedAt = data.CreatedAt.ToString("dd/MM/yyyy"),
                            InstitutionName = data.Institution.Name,
                            LocationName = data.Location.Name,
@@ -52,6 +53,7 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
                            CreatedAt = data.CreatedAt.ToString("dd/MM/yyyy"),
                            InstitutionName = data.Institution.Name,
                            LocationName = data.Location.Name,
+                           Processed = data.Processed,
                            Title = data.Title,
                            StudendMail = data.ApplicationUser.Email,
                            StudentCode = data.ApplicationUser.UserName,

@@ -52,6 +52,18 @@ public class TicketController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPatch]
+    [Route("process-ticket")]
+    public async Task<ActionResult<TicketResponse>> ProcessTicketAsync(long ticketId)
+    {
+        var response = await _tickerService.ProcessTicketAsync(ticketId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
     [HttpDelete("delete-ticket")]
     public async Task<IActionResult> DeleteInstitutionAsync(long ticketId)
     {
