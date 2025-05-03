@@ -1,4 +1,5 @@
 ﻿using BaraoFeedback.Application.DTOs.Ticket;
+using BaraoFeedback.Application.Extensions;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Infra.Context;
 using BaraoFeedback.Infra.Querys;
@@ -19,7 +20,7 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
         UserId = _context._httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
-    public async Task<List<TicketResponse>> GetTicketAsync(TicketQuery query)
+    public async Task<IQueryable<TicketResponse>> GetTicketAsync(TicketQuery query)
     {
         var tickets = (from data in _context.Ticket
                       .AsNoTracking()
@@ -36,7 +37,7 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
                            StudentCode = data.ApplicationUser.UserName,
                            StudentName = data.ApplicationUser.Name,
                            TicketId = data.Id,
-                       }).ToList();
+                       });
 
         return tickets;
     } 

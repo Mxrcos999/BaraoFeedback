@@ -54,9 +54,9 @@ public class TicketController : ControllerBase
 
     [HttpPatch]
     [Route("process-ticket")]
-    public async Task<ActionResult<TicketResponse>> ProcessTicketAsync(long ticketId)
+    public async Task<ActionResult<TicketResponse>> ProcessTicketAsync(UpdateTicket ticket)
     {
-        var response = await _tickerService.ProcessTicketAsync(ticketId);
+        var response = await _tickerService.ProcessTicketAsync(ticket.TicketId);
 
         if (!response.Sucess)
             return BadRequest(response);
@@ -75,3 +75,4 @@ public class TicketController : ControllerBase
         return Ok(response);
     }
 }
+
