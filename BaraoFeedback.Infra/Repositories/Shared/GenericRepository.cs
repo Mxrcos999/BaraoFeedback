@@ -4,6 +4,7 @@ using System.Security.Claims;
 using BaraoFeedback.Infra.Context;
 using Microsoft.EntityFrameworkCore;
 using BaraoFeedback.Application.Interfaces;
+using BaraoFeedback.Application.DTOs.Shared;
 
 namespace BaraoFeedback.Infra.Repositories.Shared;
 
@@ -38,7 +39,8 @@ public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> w
             return dbSet.AsNoTracking();
 
         return dbSet.AsNoTracking().Where(filterExpression);
-    }
+    }  
+     
 
     public virtual async Task<TEntity> GetByIdAsync(long id)
     {
@@ -83,6 +85,8 @@ public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity> w
 
     public virtual async Task<bool> UpdateAsync(TEntity entity, CancellationToken ct)
     {
+        _context.Entry(entity).State = EntityState.Modified;
+
         _entity.Update(entity);
 
         var result = await _context.SaveChangesAsync(ct);

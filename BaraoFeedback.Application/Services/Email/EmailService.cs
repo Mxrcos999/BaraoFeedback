@@ -31,28 +31,28 @@ public class EmailService : IEmailService
 
     #region Métodos Públicos
 
-    public async Task<DefaultResponse> SendPassword(string email, string userName, string password)
+    public async Task<BaseResponse<bool>> SendPassword(string email, string userName, string password)
     {
         string subject = "Conta criada com sucesso!";
         string body = EmailTemplates.GeneratePasswordEmailBody(userName, password);
         return await EnviarEmail(email, subject, body);
     }
 
-    public async Task<DefaultResponse> SendConfirmMail(string email, string userName, string confirmationLink)
+    public async Task<BaseResponse<bool>> SendConfirmMail(string email, string userName, string confirmationLink)
     {
         string subject = "Confirme seu email";
         string body = EmailTemplates.GenerateConfirmationEmailBody(userName, confirmationLink);
         return await EnviarEmail(email, subject, body);
     }
 
-    public async Task<DefaultResponse> SendForgotPasswordEmail(string email, string userName, string password)
+    public async Task<BaseResponse<bool>> SendForgotPasswordEmail(string email, string userName, string password)
     {
         string subject = "Redefinição de Senha - Barao Feedback";
         string body = EmailTemplates.GenerateForgotPasswordEmailBody(userName, password);
         return await EnviarEmail(email, subject, body);
     }
 
-    public async Task<DefaultResponse> SendEmail(TicketResponse ticket)
+    public async Task<BaseResponse<bool>> SendEmail(TicketResponse ticket)
     {
         var destinatarios = _userManager.Users
             .Where(x => x.Type == "admin")
@@ -60,7 +60,7 @@ public class EmailService : IEmailService
             .Where(IsValidEmail)
             .ToArray();
 
-        var response = new DefaultResponse();
+        var response = new BaseResponse<bool>();
         if (!destinatarios.Any())
         {
             response.Errors.AddError("Nenhum administrador com e-mail válido encontrado.");
@@ -76,14 +76,14 @@ public class EmailService : IEmailService
 
     #region Auxiliares
 
-    private async Task<DefaultResponse> EnviarEmail(string destinatario, string assunto, string corpo)
+    private async Task<BaseResponse<bool>> EnviarEmail(string destinatario, string assunto, string corpo)
     {
         return await EnviarEmail(new[] { destinatario }, assunto, corpo);
     }
 
-    private async Task<DefaultResponse> EnviarEmail(string[] destinatarios, string assunto, string corpo)
+    private async Task<BaseResponse<bool>> EnviarEmail(string[] destinatarios, string assunto, string corpo)
     {
-        var response = new DefaultResponse();
+        var response = new BaseResponse<bool>();
 
         try
         {

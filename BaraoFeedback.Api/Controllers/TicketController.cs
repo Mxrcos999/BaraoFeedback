@@ -55,7 +55,7 @@ public class TicketController : ControllerBase
     [HttpPatch]
     [Route("process-ticket")]
     public async Task<ActionResult<TicketResponse>> ProcessTicketAsync([FromQuery] long ticketId,[FromBody] UpdateTicket ticket)
-    {,
+    {
         var response = await _tickerService.ProcessTicketAsync(ticketId, ticket.Status);
 
         if (!response.Sucess)

@@ -1,10 +1,11 @@
-﻿using BaraoFeedback.Domain.Entities;
+﻿using BaraoFeedback.Application.DTOs.Shared;
+using BaraoFeedback.Domain.Entities;
 using LinqKit;
 using System.Linq.Expressions;
 
 namespace BaraoFeedback.Infra.Querys;
 
-public class TicketCategoryQuery
+public class TicketCategoryQuery : BaseGetRequest
 {
     public bool? IsDescending { get; set; } = null;
     public long? CategoryId { get; set; }

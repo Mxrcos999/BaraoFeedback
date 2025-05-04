@@ -1,4 +1,5 @@
 ﻿using BaraoFeedback.Application.DTOs.Institution;
+using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Services.Institution;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +18,23 @@ public class InstitutionController : ControllerBase
     }
 
     [HttpGet("get-institution")]
-    public async Task<IActionResult> GetInstitutionAsync()
+    public async Task<IActionResult> GetInstitutionAsync([FromQuery] BaseGetRequest request)
     {
-        var response = await _institutionService.GetInstitutionAsync();
+        var response = await _institutionService.GetInstitutionAsync(request);
 
         if (!response.Sucess)
             return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpGet("get-institution-options")]
+    public async Task<IActionResult> GetInstitutionOptionAsync()
+    {
+        var response = await _institutionService.GetInstitutionOptionsAsync();
+
+        if (response.Count == 0)
+            return NoContent();
 
         return Ok(response);
     }

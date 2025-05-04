@@ -29,13 +29,13 @@ public class TicketCategoryController : ControllerBase
         return Ok(response);
     }
     [HttpGet]
-    [Route("get-category")]
+    [Route("get-ticket-category-options")]
     public async Task<IActionResult> GetCategoryAsync()
     {
         var response = await ticketCategoryService.GetCategoryAsync();
 
-        if (!response.Sucess)
-            return BadRequest(response);
+        if (response.Count == 0)
+            return NoContent();
 
         return Ok(response);
     }

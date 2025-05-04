@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 namespace BaraoFeedback.Api.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("location/")]
 public class LocationController : ControllerBase
 {
@@ -18,12 +17,23 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("get-location/")]
-    public async Task<IActionResult> GetLocationAsync(long intitutionId)
+    public async Task<IActionResult> GetLocationAsync([FromQuery] LocationQuery query)
     {
-        var response = await _locationService.GetLocationAsync(intitutionId);
+        var response = await _locationService.GetLocationAsync(query);
 
         if (!response.Sucess)
             return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpGet("get-location-options/")]
+    public async Task<IActionResult> GetLocationOptionsAsync()
+    {
+        var response = await _locationService.GetLocationOptionsAsync();
+
+        if (response.Count == 0)
+            return NoContent();
 
         return Ok(response);
     }
