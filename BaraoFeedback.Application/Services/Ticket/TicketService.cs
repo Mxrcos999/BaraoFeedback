@@ -38,11 +38,13 @@ public class TicketService : ITicketService
 
         return response;
     }
-    public async Task<BaseResponse<bool>> ProcessTicketAsync(long id)
+    public async Task<BaseResponse<bool>> ProcessTicketAsync(long id, bool status)
     {
         var response = new BaseResponse<bool>();
 
         var ticket = await _ticketRepository.GetByIdAsync(id);
+
+        ticket.Processed = status;
 
         response.Data = await _ticketRepository.UpdateAsync(ticket, default);
 

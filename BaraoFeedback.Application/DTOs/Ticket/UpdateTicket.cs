@@ -2,5 +2,5 @@
 
 public class UpdateTicket
 {
-    public long TicketId { get; set; }
+    public bool Status { get; set; }
 }

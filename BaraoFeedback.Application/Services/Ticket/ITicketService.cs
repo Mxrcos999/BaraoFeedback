@@ -8,7 +8,7 @@ namespace BaraoFeedback.Application.Services.Ticket;
 public interface ITicketService
 {
     Task<BaseResponse<bool>> DeleteAsync(long entityId);
-    Task<BaseResponse<bool>> ProcessTicketAsync(long id);
+    Task<BaseResponse<bool>> ProcessTicketAsync(long id, bool status);
     Task<BaseResponse<List<TicketResponse>>> GetTicketAsync(TicketQuery query);
     Task<BaseResponse<TicketResponse>> GetTicketByIdAsync(long id);
     Task<BaseResponse<bool>> PostTicketAsync(TicketInsertRequest request);
