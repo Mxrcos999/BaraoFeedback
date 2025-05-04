@@ -67,6 +67,14 @@ public class TicketCategoryService : ITicketCategoryService
         return data;
     }
 
+    public async Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync()
+    {
+        var response = new BaseResponse<List<CategoryResponse>>();
+
+        response.Data = await _ticketCategoryRepository.GetCategoryListAsync();
+        return response;
+    }
+
     public async Task<BaseResponse<bool>> DeleteAsync(long entityId)
     {
         var response = new BaseResponse<bool>();

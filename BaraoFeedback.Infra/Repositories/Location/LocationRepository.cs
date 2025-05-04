@@ -36,10 +36,11 @@ public class LocationRepository : GenericRepository<Domain.Entities.Location>, I
         return data;
     }
 
-    public async Task<List<OptionResponse>> GetLocationOptionAsync()
+    public async Task<List<OptionResponse>> GetLocationOptionAsync(long institutionId)
     {
         var categoriesTickets = (from data in _context.Location
                       .AsNoTracking()
+                      .Where(x => x.InstitutionId == institutionId)
                                  select new OptionResponse()
                                  {
                                      Description = data.Name,

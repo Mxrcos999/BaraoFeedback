@@ -6,6 +6,6 @@ namespace BaraoFeedback.Application.Interfaces;
 
 public interface ILocationRepository : IGenericRepository<Location>
 {
-    Task<List<OptionResponse>> GetLocationOptionAsync();
+    Task<List<OptionResponse>> GetLocationOptionAsync(long institutionId);
     Task<LocationResponse> GetLocationWithAssociationAsync(long locationId);
 }

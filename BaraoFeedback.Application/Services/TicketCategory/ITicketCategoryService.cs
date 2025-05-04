@@ -6,7 +6,8 @@ using BaraoFeedback.Infra.Querys;
 namespace BaraoFeedback.Application.Services.TicketCategory;
 
 public interface ITicketCategoryService
-{ 
+{
+    Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync();
     Task<BaseResponse<bool>> DeleteAsync(long entityId);
     Task<List<OptionResponse>> GetCategoryAsync();
     Task<BaseResponse<List<TicketCategoryResponse>>> GetTicketCategoryAsync(TicketCategoryQuery query);

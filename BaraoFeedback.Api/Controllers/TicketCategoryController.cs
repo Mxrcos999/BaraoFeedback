@@ -39,6 +39,18 @@ public class TicketCategoryController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet]
+    [Route("get-category")]
+    public async Task<IActionResult> GetCategoryListAsync()
+    {
+        var response = await ticketCategoryService.GetCategoryListAsync();
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
     [HttpPost]
     [Route("post-category")]
 

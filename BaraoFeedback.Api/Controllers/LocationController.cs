@@ -28,9 +28,9 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("get-location-options/")]
-    public async Task<IActionResult> GetLocationOptionsAsync()
+    public async Task<IActionResult> GetLocationOptionsAsync([FromQuery] long institutionId)
     {
-        var response = await _locationService.GetLocationOptionsAsync();
+        var response = await _locationService.GetLocationOptionsAsync(institutionId);
 
         if (response.Count == 0)
             return NoContent();

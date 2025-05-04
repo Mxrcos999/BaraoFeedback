@@ -44,6 +44,19 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
         return categoriesTickets;
     }
 
+    public async Task<List<CategoryResponse>> GetCategoryListAsync()
+    {
+        var categoriesTickets = (from data in _context.TicketCategory
+                      .AsNoTracking()
+                                 select new CategoryResponse()
+                                 {
+                                     Description = data.Description,
+                                     CategoryId = data.Id,
+                                 }).ToList();
+
+        return categoriesTickets;
+    }
+
     public async Task<bool> PostCategoryTicketAsync(Domain.Entities.TicketCategory entity)
     {
         await _context.TicketCategory.AddAsync(entity);
