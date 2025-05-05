@@ -44,7 +44,7 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
         return categoriesTickets;
     }
 
-    public async Task<List<CategoryResponse>> GetCategoryListAsync()
+    public async Task<IQueryable<CategoryResponse>> GetCategoryListAsync()
     {
         var categoriesTickets = (from data in _context.TicketCategory
                       .AsNoTracking()
@@ -52,7 +52,7 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
                                  {
                                      Description = data.Description,
                                      CategoryId = data.Id,
-                                 }).ToList();
+                                 });
 
         return categoriesTickets;
     }

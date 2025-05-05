@@ -7,7 +7,7 @@ namespace BaraoFeedback.Application.Services.TicketCategory;
 
 public interface ITicketCategoryService
 {
-    Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync();
+    Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync(BaseGetRequest query);
     Task<BaseResponse<bool>> DeleteAsync(long entityId);
     Task<BaseResponse<List<OptionResponse>>> GetCategoryAsync();
     Task<BaseResponse<List<TicketCategoryResponse>>> GetTicketCategoryAsync(TicketCategoryQuery query);

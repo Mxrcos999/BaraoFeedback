@@ -1,4 +1,5 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
+using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Services.TicketCategory;
 using BaraoFeedback.Infra.Querys;
 using Microsoft.AspNetCore.Authorization;
@@ -42,9 +43,9 @@ public class TicketCategoryController : ControllerBase
 
     [HttpGet]
     [Route("get-category")]
-    public async Task<IActionResult> GetCategoryListAsync()
+    public async Task<IActionResult> GetCategoryListAsync([FromQuery] BaseGetRequest request)
     {
-        var response = await ticketCategoryService.GetCategoryListAsync();
+        var response = await ticketCategoryService.GetCategoryListAsync(request);
 
         if (!response.Sucess)
             return BadRequest(response);

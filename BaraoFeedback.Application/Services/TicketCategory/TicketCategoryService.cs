@@ -3,6 +3,7 @@ using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Extensions;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Infra.Querys;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BaraoFeedback.Application.Services.TicketCategory;
 
@@ -70,11 +71,21 @@ public class TicketCategoryService : ITicketCategoryService
         return response; 
     }
 
-    public async Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync()
+    public async Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync(BaseGetRequest query)
     {
         var response = new BaseResponse<List<CategoryResponse>>();
+        var queryable = (await _ticketCategoryRepository.GetCategoryListAsync());
+        var data = queryable.Pagination<CategoryResponse>(new BaseGetRequest()
+        {
+            Page = query.Page,
+            PageSize = query.PageSize,
+            SearchInput = query.SearchInput
+        });
 
-        response.Data = await _ticketCategoryRepository.GetCategoryListAsync();
+        response.TotalRecords = queryable.Count();
+        response.PageSize = data.Count();
+        response.Page = query.Page;
+        response.Data = data.ToList();
         return response;
     }
 
