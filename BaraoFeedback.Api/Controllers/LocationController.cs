@@ -31,9 +31,8 @@ public class LocationController : ControllerBase
     public async Task<IActionResult> GetLocationOptionsAsync([FromQuery] long institutionId)
     {
         var response = await _locationService.GetLocationOptionsAsync(institutionId);
-
-        if (response.Count == 0)
-            return NoContent();
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }

@@ -6,7 +6,7 @@ namespace BaraoFeedback.Application.Services.Institution;
 
 public interface IInstitutionService
 {
-    Task<List<OptionResponse>> GetInstitutionOptionsAsync();
+    Task<BaseResponse<List<OptionResponse>>> GetInstitutionOptionsAsync();
     Task<BaseResponse<bool>> DeleteAsync(long entityId);
     Task<BaseResponse<List<Domain.Entities.Institution>>> GetInstitutionAsync(BaseGetRequest request);
     Task<BaseResponse<bool>> PostInstitutionAsync(InstitutionInsertRequest request);

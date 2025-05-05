@@ -1,9 +1,7 @@
 ﻿using BaraoFeedback.Application.DTOs.Institution;
 using BaraoFeedback.Application.DTOs.Shared;
-using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Extensions;
 using BaraoFeedback.Application.Interfaces;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BaraoFeedback.Application.Services.Institution;
 
@@ -15,7 +13,7 @@ public class InstitutionService : IInstitutionService
     {
         this.institutionRepository = institutionRepository;
     }
-    
+
     public async Task<BaseResponse<bool>> PostInstitutionAsync(InstitutionInsertRequest request)
     {
         var response = new BaseResponse<bool>();
@@ -24,7 +22,7 @@ public class InstitutionService : IInstitutionService
         response.Data = await institutionRepository.PostAsync(entity, default);
 
         return response;
-    }    
+    }
     public async Task<BaseResponse<List<Domain.Entities.Institution>>> GetInstitutionAsync(BaseGetRequest request)
     {
         var response = new BaseResponse<List<Domain.Entities.Institution>>();
@@ -40,9 +38,13 @@ public class InstitutionService : IInstitutionService
         return response;
     }
 
-    public async Task<List<OptionResponse>> GetInstitutionOptionsAsync()
+    public async Task<BaseResponse<List<OptionResponse>>> GetInstitutionOptionsAsync()
     {
-        return await institutionRepository.GetInstitutionOptionAsync();
+        var response = new BaseResponse<List<OptionResponse>>();
+
+        response.Data = await institutionRepository.GetInstitutionOptionAsync();
+
+        return response;
     }
 
     public async Task<BaseResponse<bool>> DeleteAsync(long entityId)

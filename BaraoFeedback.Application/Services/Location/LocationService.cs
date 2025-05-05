@@ -25,9 +25,12 @@ public class LocationService : ILocationService
         return response;
     }
 
-    public async Task<List<OptionResponse>> GetLocationOptionsAsync(long institutionId)
+    public async Task<BaseResponse<List<OptionResponse>>> GetLocationOptionsAsync(long institutionId)
     {
-        return await _locationRepository.GetLocationOptionAsync(institutionId);
+        var response = new BaseResponse<List<OptionResponse>>();
+        response.Data = await _locationRepository.GetLocationOptionAsync(institutionId);
+
+        return response;
     }
     public async Task<BaseResponse<List<LocationResponse>>> GetLocationAsync(LocationQuery query)
     {

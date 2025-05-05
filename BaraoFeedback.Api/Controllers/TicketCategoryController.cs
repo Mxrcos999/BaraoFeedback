@@ -34,8 +34,8 @@ public class TicketCategoryController : ControllerBase
     {
         var response = await ticketCategoryService.GetCategoryAsync();
 
-        if (response.Count == 0)
-            return NoContent();
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }

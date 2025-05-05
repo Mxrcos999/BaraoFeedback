@@ -61,10 +61,13 @@ public class TicketCategoryService : ITicketCategoryService
         response.Page = query.Page;
         return response;
     }
-    public async Task<List<OptionResponse>> GetCategoryAsync()
-    { 
-        var data = await _ticketCategoryRepository.GetCategoryAsync();
-        return data;
+    public async Task<BaseResponse<List<OptionResponse>>> GetCategoryAsync()
+    {
+        var response = new BaseResponse<List<OptionResponse>>();
+
+        response.Data = await _ticketCategoryRepository.GetCategoryAsync();
+
+        return response; 
     }
 
     public async Task<BaseResponse<List<CategoryResponse>>> GetCategoryListAsync()

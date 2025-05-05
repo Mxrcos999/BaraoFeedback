@@ -33,8 +33,8 @@ public class InstitutionController : ControllerBase
     {
         var response = await _institutionService.GetInstitutionOptionsAsync();
 
-        if (response.Count == 0)
-            return NoContent();
+        if (!response.Sucess)
+            return BadRequest(response);
 
         return Ok(response);
     }
