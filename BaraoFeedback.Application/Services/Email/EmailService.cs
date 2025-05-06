@@ -184,7 +184,7 @@ public static class EmailTemplates
                 <p><strong>ID do Chamado:</strong> {ticket.TicketId}</p>
                 <p><strong>Descrição:</strong><br />{ticket.Description}</p>
                 <hr />
-                <p><strong>Aluno:</strong> {ticket.Title}</p>
+                <p><strong>Aluno:</strong> {ticket.StudentName}</p>
                 <p><strong>Instituição:</strong> {ticket.InstitutionName}</p>
                 <p><strong>Local:</strong> {ticket.LocationName}</p>
                 <p><strong>Categoria:</strong> {ticket.CategoryName}</p>
