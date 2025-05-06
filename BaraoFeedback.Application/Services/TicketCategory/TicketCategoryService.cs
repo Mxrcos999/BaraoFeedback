@@ -42,12 +42,12 @@ public class TicketCategoryService : ITicketCategoryService
         });
 
         if (query.IsDescending is null)
-            response.Data = data.OrderBy(x => x.CreatedAt).ToList();
+            response.Data = data.ToList().OrderBy(x => x.CreatedAt).ToList();
      
         if(query.IsDescending is not null)
         {
             if (query.IsDescending.Value)
-                response.Data = data.OrderByDescending(x => x.TicketQuantity).ToList();
+                response.Data = data.ToList().OrderByDescending(x => x.TicketQuantity).ToList();
 
             if (!query.IsDescending.Value)
             {
