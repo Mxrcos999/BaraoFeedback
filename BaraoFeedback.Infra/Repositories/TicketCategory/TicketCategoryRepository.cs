@@ -35,6 +35,7 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
     {
         var categoriesTickets = (from data in _context.TicketCategory
                       .AsNoTracking()
+                      .Where(x => x.IsActive == true)
                                  select new OptionResponse()
                                  {
                                      Description = data.Description,
@@ -48,6 +49,7 @@ public class TicketCategoryRepository : GenericRepository<Domain.Entities.Ticket
     {
         var categoriesTickets = (from data in _context.TicketCategory
                       .AsNoTracking()
+                      .Where(x => x.IsActive == true)
                                  select new CategoryResponse()
                                  {
                                      Description = data.Description,

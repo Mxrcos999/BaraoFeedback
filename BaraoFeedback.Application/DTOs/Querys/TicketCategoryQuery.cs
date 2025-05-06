@@ -10,11 +10,19 @@ public class TicketCategoryQuery : BaseGetRequest
     public bool? IsDescending { get; set; } = null;
     public long? CategoryId { get; set; }
     public long? InstitutionId { get; set; }
+    public bool? IsInactive { get; set; }
     public long? LocationId { get; set; }
 
     public Expression<Func<TicketCategory, bool>> CreateFilterExpression()
     {
         var predicate = PredicateBuilder.True<TicketCategory>();
+        if(IsInactive is null)
+            predicate = predicate.And(x => x.IsActive == true);
+
+        if(IsInactive.Value)
+            predicate = predicate.And(x => x.IsActive == false);
+        else
+            predicate = predicate.And(x => x.IsActive == true);
 
         if (CategoryId is not null && CategoryId > 0)
             predicate = predicate.And(x => x.Id == CategoryId);

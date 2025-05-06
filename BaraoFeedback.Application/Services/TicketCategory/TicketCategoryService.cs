@@ -20,11 +20,12 @@ public class TicketCategoryService : ITicketCategoryService
     {
         var response = new BaseResponse<bool>();
 
-        response.Data = await _ticketCategoryRepository.PostCategoryTicketAsync(new Domain.Entities.TicketCategory()
-        {
-            Description = request.Description,
-
-        });
+        response.Data = await _ticketCategoryRepository.PostCategoryTicketAsync
+            (new Domain.Entities.TicketCategory()
+            {
+                Description = request.Description,
+                IsActive = true 
+            });
 
         return response;
     }
@@ -93,7 +94,9 @@ public class TicketCategoryService : ITicketCategoryService
     {
         var response = new BaseResponse<bool>();
         var entity = await _ticketCategoryRepository.GetByIdAsync(entityId);
-        response.Data = await _ticketCategoryRepository.DeleteAsync(entity, default);
+
+        entity.IsActive = false;
+        response.Data = await _ticketCategoryRepository.UpdateAsync(entity, default);
 
         return response;
     }
