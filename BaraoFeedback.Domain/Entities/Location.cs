@@ -11,6 +11,17 @@ public class Location : Entity
         Description = description;
         InstitutionId = institutionId;
     }
+    public void Update(string name, string description, long? institutionId)
+    {
+        if(!string.IsNullOrEmpty(name))
+            Name = name;
+
+        if (!string.IsNullOrEmpty(description))
+            Description = description;
+
+        if (institutionId.HasValue || institutionId.Value > 0)
+            InstitutionId = institutionId.Value;
+    }
     public Location() { }
 
     public string Name { get; private set; }

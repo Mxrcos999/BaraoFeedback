@@ -77,4 +77,14 @@ public class LocationService : ILocationService
 
         return response;
     }
+
+    public async Task<BaseResponse<bool>> UpdateAsync(long entityId, LocationUpdateRequest location)
+    {
+        var response = new BaseResponse<bool>();
+        var entity = await _locationRepository.GetByIdAsync(entityId);
+        entity.Update(location.Name, location.Description, location.InstitutionId);
+        response.Data = await _locationRepository.UpdateAsync(entity, default);
+
+        return response;
+    }
 }

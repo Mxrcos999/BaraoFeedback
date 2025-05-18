@@ -67,5 +67,18 @@ public class LocationController : ControllerBase
             return BadRequest(response);
 
         return Ok(response);
+    }  
+    
+    [HttpPut("update-location/")]
+    public async Task<IActionResult> UpdateLocationAsync
+        ([FromBody] LocationUpdateRequest location,
+        [FromQuery] long locationId)
+    {
+        var response = await _locationService.UpdateAsync(locationId, location);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
     } 
 }

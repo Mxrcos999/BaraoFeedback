@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaraoFeedback.Api.Controllers;
 
-[ApiController] 
+[ApiController]
 [Route("institution/")]
 public class InstitutionController : ControllerBase
 {
@@ -48,10 +48,22 @@ public class InstitutionController : ControllerBase
 
         return Ok(response);
     }
+
     [HttpDelete("delete-institution")]
     public async Task<IActionResult> DeleteInstitutionAsync(long institutionId)
     {
         var response = await _institutionService.DeleteAsync(institutionId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpPut("update-institution")]
+    public async Task<IActionResult> DeleteInstitutionAsync([FromQuery] long institutionId, [FromBody] InstitutionUpdateRequest model)
+    {
+        var response = await _institutionService.UpdateAsync(institutionId, model);
 
         if (!response.Sucess)
             return BadRequest(response);

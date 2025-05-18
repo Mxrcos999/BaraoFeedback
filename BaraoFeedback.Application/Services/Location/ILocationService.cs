@@ -5,6 +5,7 @@ namespace BaraoFeedback.Application.Services.Location;
 
 public interface ILocationService
 {
+    Task<BaseResponse<bool>> UpdateAsync(long entityId, LocationUpdateRequest location);
     Task<BaseResponse<List<OptionResponse>>> GetLocationOptionsAsync(long institutionId);
     Task<BaseResponse<LocationResponse>> GetLocationByIdAsync(long locationId);
     Task<BaseResponse<bool>> PostLocationAsync(LocationInsertRequest request);

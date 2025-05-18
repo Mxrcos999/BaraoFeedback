@@ -65,9 +65,20 @@ public class TicketCategoryController : ControllerBase
         return Ok(response);
     }
     [HttpDelete("delete-category")]
-    public async Task<IActionResult> DeleteInstitutionAsync(long categoryId)
+    public async Task<IActionResult> DeleteTicketCategoryAsync(long categoryId)
     {
         var response = await ticketCategoryService.DeleteAsync(categoryId);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }    
+    
+    [HttpPut("update-category")]
+    public async Task<IActionResult> UpdateTicketCategoryAsync([FromBody] TicketCategoryUpdateRequest category, [FromQuery]long categoryId)
+    {
+        var response = await ticketCategoryService.TicketCategoryUpdate(categoryId, category);
 
         if (!response.Sucess)
             return BadRequest(response);

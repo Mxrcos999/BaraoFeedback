@@ -55,4 +55,14 @@ public class InstitutionService : IInstitutionService
 
         return response;
     }
+
+    public async Task<BaseResponse<bool>> UpdateAsync(long entityId, InstitutionUpdateRequest institution)
+    {
+        var response = new BaseResponse<bool>();
+        var entity = await institutionRepository.GetByIdAsync(entityId);
+        entity.Update(institution.Name, institution.Cep);
+        response.Data = await institutionRepository.UpdateAsync(entity, default);
+
+        return response;
+    }
 }
