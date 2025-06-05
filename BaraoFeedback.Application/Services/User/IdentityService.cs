@@ -31,7 +31,7 @@ public class IdentityService : IIdentityService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<DefaultResponse> UpdateNameAsync(UpdateUserRequest model)
+    public async Task<DefaultResponse> UpdateNameAsync(PatchUserRequest model)
     {
         var response = new DefaultResponse();
 
@@ -43,6 +43,22 @@ public class IdentityService : IIdentityService
 
         if (!result.Succeeded)
             response.Errors.AddError("Erro ao alterar nome do usuário");
+
+        return response;
+    }
+    public async Task<DefaultResponse> UpdateUserAsync(string userId, UpdateUserRequest model)
+    {
+        var response = new DefaultResponse();
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        user.Name = model.Name;
+        user.Email = model.Email;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            response.Errors.AddError("Erro ao alterar usuário");
 
         return response;
     }

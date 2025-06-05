@@ -87,9 +87,23 @@ public class UserController : ControllerBase
 
     [HttpPatch]
     [Route("user/update-name")]
-    public async Task<IActionResult> UpdateNameAsync(UpdateUserRequest model)
+    public async Task<IActionResult> UpdateNameAsync(PatchUserRequest model)
     {
         var response = await _userService.UpdateNameAsync(model);
+
+        if (!response.Sucess)
+            return BadRequest(response);
+
+        return Ok(response);
+    }
+
+    [HttpPut]
+    [Route("user/update-user")]
+    public async Task<IActionResult> UpdateUserAsync
+        ([FromQuery] string userId,
+        [FromBody] UpdateUserRequest model)
+    {
+        var response = await _userService.UpdateUserAsync(userId, model);
 
         if (!response.Sucess)
             return BadRequest(response);
