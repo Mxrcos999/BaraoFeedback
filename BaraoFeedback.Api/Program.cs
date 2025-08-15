@@ -14,6 +14,7 @@ using BaraoFeedback.Infra.Repositories.TicketCategory;
 using BaraoFeedback.Infra.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BaraoFeedback.Api
 {
@@ -21,7 +22,7 @@ namespace BaraoFeedback.Api
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args); 
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -51,7 +52,13 @@ namespace BaraoFeedback.Api
             builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 
             builder.Services.AddDbContext<BaraoFeedbackContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("strConnection")));
+                options
+                .UseSqlServer(builder.Configuration.GetConnectionString("strConnection"),
+                 sqlOptions => sqlOptions.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(15),
+        errorNumbersToAdd: null)));
+ 
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                .AddRoles<IdentityRole>()

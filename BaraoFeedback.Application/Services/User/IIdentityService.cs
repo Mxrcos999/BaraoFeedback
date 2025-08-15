@@ -5,6 +5,7 @@ namespace BaraoFeedback.Application.Services.User;
 
 public interface IIdentityService
 {
+    Task<bool> SetReceiveEmailAsync(string id, bool flag);
     Task<DefaultResponse> ForgotPassword(ForgotPasswordDto model);
     Task<DefaultResponse> UpdateNameAsync(PatchUserRequest model);
     Task<DefaultResponse> DeleteUser(string id);

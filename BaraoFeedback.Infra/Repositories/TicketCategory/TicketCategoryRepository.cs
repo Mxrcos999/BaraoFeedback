@@ -2,9 +2,9 @@
 using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Infra.Context;
-using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Application.DTOs.Querys;
 using BaraoFeedback.Infra.Repositories.Shared;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BaraoFeedback.Infra.Repositories.TicketCategory;
 

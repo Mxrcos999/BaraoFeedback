@@ -1,4 +1,5 @@
-﻿using BaraoFeedback.Application.DTOs.User;
+﻿using BaraoFeedback.Application.DTOs.Shared;
+using BaraoFeedback.Application.DTOs.User;
 using BaraoFeedback.Application.Services.Email;
 using BaraoFeedback.Application.Services.User;
 using Microsoft.AspNetCore.Identity;
@@ -86,6 +87,22 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch]
+    [Route("user/set-received-email")]
+    public async Task<IActionResult> ReceivedEmailAsync([FromQuery] string userId, [FromBody]AdminFlagUpdate model)
+    {
+        var response = await _userService.SetReceiveEmailAsync(userId, model.ReceiveEmail);
+        var defaultResponse = new DefaultResponse();
+        if (!response)
+        {
+            defaultResponse.Errors.AddError("Erro ao atualizar flag");
+            return BadRequest(defaultResponse);
+
+        }
+
+        return Ok(defaultResponse);
+    }
+
+    [HttpPatch]
     [Route("user/update-name")]
     public async Task<IActionResult> UpdateNameAsync(PatchUserRequest model)
     {
@@ -131,5 +148,4 @@ public class UserController : ControllerBase
 
         return Ok(response); 
     } 
-    
 }

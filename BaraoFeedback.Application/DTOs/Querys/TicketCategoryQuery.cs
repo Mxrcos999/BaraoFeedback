@@ -3,7 +3,7 @@ using BaraoFeedback.Domain.Entities;
 using LinqKit;
 using System.Linq.Expressions;
 
-namespace BaraoFeedback.Infra.Querys;
+namespace BaraoFeedback.Application.DTOs.Querys;
 
 public class TicketCategoryQuery : BaseGetRequest
 {

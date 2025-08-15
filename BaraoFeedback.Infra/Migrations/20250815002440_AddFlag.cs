@@ -5,25 +5,24 @@
 namespace BaraoFeedback.Infra.Migrations
 {
     /// <inheritdoc />
-    public partial class ColumnProcessAdded : Migration
+    public partial class AddFlag : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
-                name: "Processed",
-                table: "Ticket",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
+                name: "ReceiveEmails",
+                table: "AspNetUsers",
+                type: "bit",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Processed",
-                table: "Ticket");
+                name: "ReceiveEmails",
+                table: "AspNetUsers");
         }
     }
 }

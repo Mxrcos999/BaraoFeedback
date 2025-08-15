@@ -22,4 +22,5 @@ public class AdminRegisterRequest
     [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "O nome não deve conter números.")]
     public string Name { get; set; }
     public string Email { get; set; } 
+    public bool ReceiveEmails { get; set; } 
 }

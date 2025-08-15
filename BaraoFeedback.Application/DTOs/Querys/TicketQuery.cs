@@ -3,7 +3,7 @@ using BaraoFeedback.Domain.Entities;
 using LinqKit;
 using System.Linq.Expressions;
 
-namespace BaraoFeedback.Infra.Querys;
+namespace BaraoFeedback.Application.DTOs.Querys;
 
 public class TicketQuery : BaseGetRequest
 {
@@ -14,9 +14,9 @@ public class TicketQuery : BaseGetRequest
     public string? StudentCode { get; set; }
     public DateTime? InitialDate { get; set; }
     public DateTime? EndDate { get; set; }
-    public Expression<Func<Ticket, bool>> CreateFilterExpression()
+    public Expression<Func<Domain.Entities.Ticket, bool>> CreateFilterExpression()
     {
-        var predicate = PredicateBuilder.True<Ticket>();
+        var predicate = PredicateBuilder.True<Domain.Entities.Ticket>();
 
         if(Process is not null)
             predicate = predicate.And(x => x.Processed == Process);

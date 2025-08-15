@@ -1,5 +1,6 @@
 ﻿using BaraoFeedback.Domain.Entities;
 using BaraoFeedback.Domain.Entities.Base;
+using BaraoFeedback.Infra.Mappings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -32,8 +33,13 @@ public class BaraoFeedbackContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        //builder.ApplyConfiguration(new ApplicationUserMap()); 
+        // Aplicando os mappings
+        builder.ApplyConfiguration(new TicketMap());
+        builder.ApplyConfiguration(new LocationMap());
+        builder.ApplyConfiguration(new InstitutionMap());
+        builder.ApplyConfiguration(new TicketCategoryMap());
     }
+    
     public DbSet<Location> Location { get; set; }
     public DbSet<TicketCategory> TicketCategory { get; set; }
     public DbSet<Ticket> Ticket { get; set; } 

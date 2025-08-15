@@ -1,6 +1,6 @@
 ﻿using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Services.Ticket;
-using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Application.DTOs.Querys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,6 +73,24 @@ public class TicketController : ControllerBase
             return BadRequest(response);
 
         return Ok(response);
+    }
+
+    [HttpGet]
+    [Route("generate-report")]
+    public async Task<IActionResult> GenerateTicketReportAsync([FromQuery] TicketQuery query)
+    {
+        try
+        {
+            var excelBytes = await _tickerService.GenerateTicketReportAsync(query);
+            
+            var fileName = $"relatorio_tickets_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            
+            return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Erro ao gerar relatório", error = ex.Message });
+        }
     }
 }
 

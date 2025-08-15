@@ -101,6 +101,7 @@ public class IdentityService : IIdentityService
         {
             Email = request.Email,
             Type = type,
+            ReceiveEmails = request.ReceiveEmails,
             Name = request.Name,
             UserName = request.Email,
         };
@@ -151,7 +152,7 @@ public class IdentityService : IIdentityService
     {
         var users = _userManager.Users
             .Where(x => x.Type == "admin")
-            .Select(u => new { u.Id, u.UserName, u.Name, u.Email })
+            .Select(u => new { u.Id, u.UserName, u.Name, u.Email, u.ReceiveEmails })
             .ToList();
 
         var response = new DefaultResponse();
@@ -353,6 +354,15 @@ public class IdentityService : IIdentityService
         var random = new Random();
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    public async Task<bool> SetReceiveEmailAsync(string id, bool flag)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+
+        user.ReceiveEmails = flag;
+
+        return (await _userManager.UpdateAsync(user)).Succeeded;
     }
 
 

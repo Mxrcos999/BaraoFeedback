@@ -1,7 +1,7 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
+using BaraoFeedback.Application.DTOs.Querys;
 using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Domain.Entities;
-using BaraoFeedback.Infra.Querys;
 
 namespace BaraoFeedback.Application.Interfaces;
 

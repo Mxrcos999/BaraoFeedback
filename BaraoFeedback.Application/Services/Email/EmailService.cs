@@ -55,11 +55,11 @@ public class EmailService : IEmailService
     public async Task<BaseResponse<bool>> SendEmail(TicketResponse ticket)
     {
         var destinatarios = _userManager.Users
-            .Where(x => x.Type == "admin")
+            .Where(x => x.Type == "admin" && x.ReceiveEmails == true)
             .Select(x => x.Email)
             .Where(IsValidEmail)
             .ToArray();
-
+      
         var response = new BaseResponse<bool>();
         if (!destinatarios.Any())
         {

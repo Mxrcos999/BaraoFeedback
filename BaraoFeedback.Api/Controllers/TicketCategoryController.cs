@@ -1,7 +1,7 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
 using BaraoFeedback.Application.DTOs.Shared;
 using BaraoFeedback.Application.Services.TicketCategory;
-using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Application.DTOs.Querys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

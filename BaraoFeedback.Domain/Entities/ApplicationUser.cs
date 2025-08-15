@@ -6,4 +6,5 @@ public class ApplicationUser : IdentityUser
 {
     public string Type { get; set; }
     public string Name { get; set; }
+    public bool? ReceiveEmails { get; set; }
 }

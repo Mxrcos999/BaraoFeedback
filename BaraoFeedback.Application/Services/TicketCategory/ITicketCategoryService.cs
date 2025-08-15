@@ -1,7 +1,6 @@
 ﻿using BaraoFeedback.Application.DTOs.Category;
 using BaraoFeedback.Application.DTOs.Shared;
-using BaraoFeedback.Application.Interfaces;
-using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Application.DTOs.Querys;
 
 namespace BaraoFeedback.Application.Services.TicketCategory;
 

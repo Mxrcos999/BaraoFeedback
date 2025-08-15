@@ -3,7 +3,10 @@ using BaraoFeedback.Application.DTOs.Ticket;
 using BaraoFeedback.Application.Extensions;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Application.Services.Email;
-using BaraoFeedback.Infra.Querys; 
+using BaraoFeedback.Application.DTOs.Querys;
+using OfficeOpenXml;
+using System.IO;
+
 namespace BaraoFeedback.Application.Services.Ticket;
 
 public class TicketService : ITicketService
@@ -78,5 +81,86 @@ public class TicketService : ITicketService
         response.Data = await _ticketRepository.DeleteAsync(entity, default);
 
         return response;
+    }
+
+    public async Task<byte[]> GenerateTicketReportAsync(TicketQuery query)
+    {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        
+        var tickets = await _ticketRepository.GetTicketReportAsync(query);
+        var ticketList = tickets.ToList();
+
+        using var package = new ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("Relatório de Tickets");
+
+        // Cabeçalhos
+        worksheet.Cells[1, 1].Value = "ID do Ticket";
+        worksheet.Cells[1, 2].Value = "Título";
+        worksheet.Cells[1, 3].Value = "Descrição";
+        worksheet.Cells[1, 4].Value = "Código do Aluno";
+        worksheet.Cells[1, 5].Value = "Nome do Aluno";
+        worksheet.Cells[1, 6].Value = "Email do Aluno";
+        worksheet.Cells[1, 7].Value = "Instituição";
+        worksheet.Cells[1, 8].Value = "Local";
+        worksheet.Cells[1, 9].Value = "Categoria";
+        worksheet.Cells[1, 10].Value = "Status";
+        worksheet.Cells[1, 11].Value = "Data de Criação";
+
+        // Estilizar cabeçalhos
+        var headerRange = worksheet.Cells[1, 1, 1, 11];
+        headerRange.Style.Font.Bold = true;
+        headerRange.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+        headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        headerRange.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+
+        // Dados
+        for (int i = 0; i < ticketList.Count; i++)
+        {
+            var ticket = ticketList[i];
+            var row = i + 2;
+
+            worksheet.Cells[row, 1].Value = ticket.TicketId;
+            worksheet.Cells[row, 2].Value = ticket.Title;
+            worksheet.Cells[row, 3].Value = ticket.Description;
+            worksheet.Cells[row, 4].Value = ticket.StudentCode;
+            worksheet.Cells[row, 5].Value = ticket.StudentName;
+            worksheet.Cells[row, 6].Value = ticket.StudentEmail;
+            worksheet.Cells[row, 7].Value = ticket.InstitutionName;
+            worksheet.Cells[row, 8].Value = ticket.LocationName;
+            worksheet.Cells[row, 9].Value = ticket.CategoryName;
+            worksheet.Cells[row, 10].Value = ticket.Status;
+            worksheet.Cells[row, 11].Value = ticket.CreatedAt;
+
+            // Estilizar células de status
+            if (ticket.Status == "Processado")
+            {
+                worksheet.Cells[row, 10].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells[row, 10].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGreen);
+            }
+            else
+            {
+                worksheet.Cells[row, 10].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells[row, 10].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightYellow);
+            }
+        }
+
+        // Auto-dimensionar colunas
+        worksheet.Cells.AutoFitColumns();
+
+        // Adicionar bordas
+        var dataRange = worksheet.Cells[1, 1, ticketList.Count + 1, 11];
+        dataRange.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+        dataRange.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        dataRange.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        dataRange.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        dataRange.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+        // Adicionar informações do relatório
+        worksheet.Cells[ticketList.Count + 3, 1].Value = $"Relatório gerado em: {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+        worksheet.Cells[ticketList.Count + 3, 1].Style.Font.Bold = true;
+        worksheet.Cells[ticketList.Count + 4, 1].Value = $"Total de tickets: {ticketList.Count}";
+        worksheet.Cells[ticketList.Count + 4, 1].Style.Font.Bold = true;
+
+        return await package.GetAsByteArrayAsync();
     }
 }

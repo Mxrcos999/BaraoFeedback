@@ -2,7 +2,7 @@
 using BaraoFeedback.Application.Extensions;
 using BaraoFeedback.Application.Interfaces;
 using BaraoFeedback.Infra.Context;
-using BaraoFeedback.Infra.Querys;
+using BaraoFeedback.Application.DTOs.Querys;
 using BaraoFeedback.Infra.Repositories.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -75,5 +75,28 @@ public class TicketRepository : GenericRepository<Domain.Entities.Ticket>, ITick
             return true;
 
         return false;
-    } 
+     }
+
+    public async Task<IQueryable<TicketReportResponse>> GetTicketReportAsync(TicketQuery query)
+    {
+        var tickets = (from data in _context.Ticket
+                      .AsNoTracking()
+                      .Where(query.CreateFilterExpression())
+                       select new TicketReportResponse()
+                       {
+                           TicketId = data.Id,
+                           Title = data.Title,
+                           Description = data.Description,
+                           StudentCode = data.ApplicationUser.UserName,
+                           StudentName = data.ApplicationUser.Name,
+                           StudentEmail = data.ApplicationUser.Email,
+                           InstitutionName = data.Institution.Name,
+                           LocationName = data.Location.Name,
+                           CategoryName = data.TicketCategory.Description,
+                           Status = data.Processed ? "Processado" : "Pendente",
+                           CreatedAt = data.CreatedAt.ToString("dd/MM/yyyy HH:mm"),
+                       });
+
+        return tickets;
+    }
 }
